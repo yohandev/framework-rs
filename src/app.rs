@@ -20,7 +20,10 @@ pub trait App: 'static
     /// update the state of the app
     fn update(&mut self, time: &Time)
     {
-        print!("\r{:0<8} FPS", format!("{:.1}", 1.0 / time.dt()));
+        if time.fps_was_updated()
+        {
+            println!("{:.1}", time.fps());
+        }
     }
 
     /// called once when the app starts
