@@ -62,9 +62,12 @@ pub fn run_instance<T: App>(mut state: T)
     let mut input = WinitInputHelper::new();
     let mut time = Time::new();
     
+    // start state
+    state.start();
+
     events.run(move |evt, _, control_flow|
     {
-        // Draw the current frame
+        // draw the current frame
         if let Event::RedrawRequested(_) = evt
         {
             // get the frame
