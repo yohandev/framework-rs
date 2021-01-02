@@ -22,7 +22,7 @@ pub trait App: 'static
     {
         if time.fps_was_updated()
         {
-            println!("{:.1}", time.fps());
+            println!("{:.1} FPS", time.fps());
         }
     }
 
