@@ -1,4 +1,4 @@
-use crate::sound::{ Sample, StreamWriter };
+use crate::sound::StreamWriter;
 
 /// manages audio and connects to endpoints(out speaker, in microphone)
 pub struct AudioCtx
@@ -8,7 +8,7 @@ pub struct AudioCtx
 
 impl AudioCtx
 {
-    pub fn play<S: Sample, T: StreamWriter<S>>(&mut self, _clip: &impl Into<T>)
+    pub fn play<T: StreamWriter>(&mut self, _clip: &impl Into<T>)
     {
         // ...
     }

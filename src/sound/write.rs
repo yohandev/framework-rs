@@ -4,7 +4,7 @@ use crate::sound::{ AudioBuf, Sample };
 pub type Stream<'a, S> = AudioBuf<S, &'a mut [S]>;
 
 /// trait for types that write to the output stream
-pub trait StreamWriter<S: Sample>
+pub trait StreamWriter
 {
     /// type being used for each sample
     type Sample: Sample;
