@@ -31,7 +31,7 @@ impl<S: Sample, T: Buf<S>> AudioBuf<S, T>
     }
 
     /// number of channels in this audio buffer
-    pub fn channels(&self) -> usize
+    pub fn channel_count(&self) -> usize
     {
         self.channel_count
     }
