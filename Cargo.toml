@@ -5,6 +5,7 @@ authors = ["yohandev"]
 edition = "2018"
 
 [dependencies]
+audrey = "0.2.0"
 cpal = "0.13.1"
 image = "0.23.12"
 num-traits = "0.2.14"

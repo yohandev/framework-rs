@@ -21,9 +21,11 @@
 //! ```
 
 mod clip;
+mod file;
 mod buf;
 
 pub use clip::AudioClip;
+pub use file::AudioFile;
 pub use buf::AudioBuf;
 
 pub use cpal::Sample;
