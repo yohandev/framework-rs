@@ -1,7 +1,6 @@
 use std::sync::mpsc::{ channel, Sender };
 
-use super::{iter::AnySampleIterator, silence};
-use crate::sound::SampleType;
+use crate::sound::{ SampleType, silence, iter };
 
 /// output endpoint for audio
 pub struct Speakers
@@ -16,7 +15,7 @@ pub struct Speakers
 }
 
 /// sample iterator now playing
-type Track = Box<dyn AnySampleIterator>;
+type Track = Box<dyn iter::AnySampleIterator>;
 
 /// errors that could occur upon speakers creation
 #[derive(Debug)]
@@ -93,7 +92,7 @@ impl Speakers
     }
 
     /// change the track currently playing
-    pub fn play(&self, track: impl AnySampleIterator)
+    pub fn play(&self, track: impl iter::AnySampleIterator)
     {
         self.send
             .send(Box::new(track))
