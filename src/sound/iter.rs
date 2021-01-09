@@ -24,7 +24,7 @@ pub(crate) trait AnySampleIterator
     fn write_next_sample(&mut self, stream: &mut [u8], format: SampleType) -> bool;
 }
 
-impl<T: SampleIterator<Format = f32>> AnySampleIterator for T
+impl<S: Sample, T: SampleIterator<Format = S>> AnySampleIterator for T
 {
     fn write_next_sample(&mut self, stream: &mut [u8], format: SampleType) -> bool
     {
@@ -39,9 +39,9 @@ impl<T: SampleIterator<Format = f32>> AnySampleIterator for T
             {
                 match format
                 {
-                    F32 => stream[0..4].copy_from_slice(&s.to_ne_bytes()),
-                    I16 => stream[0..4].copy_from_slice(&s.to_i16().to_ne_bytes()),
-                    U16 => stream[0..4].copy_from_slice(&s.to_u16().to_ne_bytes()),
+                    F32 => stream[0..4].copy_from_slice(&s.to_f32().to_ne_bytes()),
+                    I16 => stream[0..2].copy_from_slice(&s.to_i16().to_ne_bytes()),
+                    U16 => stream[0..2].copy_from_slice(&s.to_u16().to_ne_bytes()),
                 }
                 false
             }
