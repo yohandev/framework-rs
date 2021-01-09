@@ -40,8 +40,8 @@ impl<T: SampleIterator<Format = f32>> AnySampleIterator for T
                 match format
                 {
                     F32 => stream[0..4].copy_from_slice(&s.to_ne_bytes()),
-                    U16 => {}
                     I16 => {}
+                    U16 => {}
                 }
                 false
             }
