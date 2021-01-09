@@ -1,5 +1,5 @@
 /// trait for types that contain PCM data
-pub trait Sample: Sized
+pub trait Sample: Sized + cpal::Sample
 {
     /// the silence value, as the name implies
     const SILENCE: Self;

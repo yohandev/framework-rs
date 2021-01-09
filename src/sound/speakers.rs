@@ -89,6 +89,27 @@ impl Speakers
                     bytes = &mut bytes[smps..];
                 };
             }
+            // (temporary) silence
+            else
+            {
+                drop(bytes);
+
+                fn silence<T: crate::sound::Sample>(data: &mut cpal::Data)
+                {
+                    data
+                        .as_slice_mut::<T>()
+                        .unwrap()
+                        .iter_mut()
+                        .for_each(|i| *i = T::SILENCE);
+                }
+
+                match smpf
+                {
+                    cpal::SampleFormat::I16 => silence::<i16>(data),
+                    cpal::SampleFormat::U16 => silence::<u16>(data),
+                    cpal::SampleFormat::F32 => silence::<f32>(data),
+                }
+            }
 
         }, e_fn).map_err(|e| SpeakersErr::BuildStreamError(e))?;
 
