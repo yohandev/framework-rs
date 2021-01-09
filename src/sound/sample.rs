@@ -81,3 +81,18 @@ impl Sample for u16
     #[inline]
     fn to_u16(self) -> u16 { self }
 }
+
+impl From<cpal::SampleFormat> for SampleType
+{
+    fn from(format: cpal::SampleFormat) -> Self
+    {
+        use cpal::SampleFormat::*;
+
+        match format
+        {
+            I16 => Self::I16,
+            U16 => Self::U16,
+            F32 => Self::F32
+        }
+    }
+}
