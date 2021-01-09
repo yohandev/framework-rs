@@ -10,16 +10,13 @@ pub struct Speakers
     _stream: cpal::Stream,
 
     /// send tracks to the audio thread to play
-    send: Sender<NowPlaying>,
+    send: Sender<Track>,
     /// config: (s)a(mp)le (t)ype
     smpt: SampleType,
 }
 
-/// sample iterator that could (or not) exist
-// #[derive(Default)]
-// struct Track(Mutex<Option<Box<dyn AnySampleIterator + Send + Sync>>>);
-
-type NowPlaying = Box<dyn AnySampleIterator + Send + Sync>;
+/// sample iterator now playing
+type Track = Box<dyn AnySampleIterator>;
 
 /// errors that could occur upon speakers creation
 #[derive(Debug)]
@@ -61,7 +58,7 @@ impl Speakers
         let e_fn = |e| eprintln!("an error occured on stream: {}", e);
         
         // track now playing
-        let mut track = Option::<NowPlaying>::None;
+        let mut track = Option::<Track>::None;
         // track next-up(send, recv)
         let (send, recv) = channel();
         
@@ -105,7 +102,7 @@ impl Speakers
     }
 
     /// change the track currently playing
-    pub fn play(&self, track: impl AnySampleIterator + Send + Sync + 'static)
+    pub fn play(&self, track: impl AnySampleIterator)
     {
         self.send
             .send(Box::new(track))

@@ -2,7 +2,7 @@ use crate::sound::{ Sample, SampleType };
 
 /// an iterator that specifically yields samples to be
 /// written to an audio output stream
-pub trait SampleIterator
+pub trait SampleIterator: Send + Sync + 'static
 {
     /// format of the sample returned by this iterator
     type Format: Sample;
@@ -14,7 +14,7 @@ pub trait SampleIterator
 
 /// abstraction over `SampleIterator` to permit dynamic
 /// types
-pub trait AnySampleIterator
+pub trait AnySampleIterator: Send + Sync + 'static
 {
     /// write `self`'s next sample directly to the stream.
     /// assume `stream` starts at the correct cursor(index 0)
