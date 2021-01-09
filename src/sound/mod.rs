@@ -21,12 +21,12 @@
 //! ```
 
 mod sample;
-mod write;
+mod iter;
 mod clip;
 mod buf;
 mod ctx;
 
+pub use sample::{ Sample, SampleType };
+pub use iter::SampleIterator;
 pub use clip::Clip;
 pub use buf::AudioBuf;
-
-pub use cpal::Sample;
