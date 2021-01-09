@@ -1,6 +1,6 @@
 use std::sync::mpsc::{ channel, Sender };
 
-use super::iter::AnySampleIterator;
+use super::{iter::AnySampleIterator, silence};
 use crate::sound::SampleType;
 
 /// output endpoint for audio
@@ -75,24 +75,10 @@ impl Speakers
                 // TODO: do something with whether track is done or not
                 curr.write_samples(data.bytes_mut(), smpt);
             }
-            // (temporary) silence
+            // silence
             else
             {
-                fn silence<T: crate::sound::Sample>(data: &mut cpal::Data)
-                {
-                    data
-                        .as_slice_mut::<T>()
-                        .unwrap()
-                        .iter_mut()
-                        .for_each(|i| *i = T::SILENCE);
-                }
-
-                match smpf
-                {
-                    cpal::SampleFormat::I16 => silence::<i16>(data),
-                    cpal::SampleFormat::U16 => silence::<u16>(data),
-                    cpal::SampleFormat::F32 => silence::<f32>(data),
-                }
+                silence::write_silence(data, smpt);
             }
 
         }, e_fn).map_err(|e| SpeakersErr::BuildStreamError(e))?;

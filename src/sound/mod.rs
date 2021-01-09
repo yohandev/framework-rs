@@ -20,11 +20,12 @@
 //!                             // and playback simultaneously
 //! ```
 
+mod speakers;
+mod silence;
 mod sample;
 mod iter;
 mod clip;
 mod buf;
-mod speakers;
 
 pub use speakers::Speakers;
 pub use sample::{ Sample, SampleType };
