@@ -1,5 +1,3 @@
-use crate::sound::Sample;
-
 /// represents a buffer of interleaved audio samples
 pub struct AudioBuf<S, T: Buf<S>>
 {

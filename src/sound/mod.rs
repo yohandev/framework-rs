@@ -24,8 +24,9 @@ mod sample;
 mod iter;
 mod clip;
 mod buf;
-mod ctx;
+mod speakers;
 
+pub use speakers::Speakers;
 pub use sample::{ Sample, SampleType };
 pub use iter::SampleIterator;
 pub use clip::Clip;
