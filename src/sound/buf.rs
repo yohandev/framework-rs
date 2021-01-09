@@ -1,7 +1,7 @@
 use crate::sound::Sample;
 
 /// represents a buffer of interleaved audio samples
-pub struct AudioBuf<S: Sample, T: Buf<S>>
+pub struct AudioBuf<S, T: Buf<S>>
 {
     /// interleaved samples [Channel1Sample1, C2S1, C1S2, C2S2, ...]
     samples: T,
@@ -16,9 +16,9 @@ pub struct AudioBuf<S: Sample, T: Buf<S>>
 
 /// restrictions for a type that can be used as an audio
 /// buffer
-pub trait Buf<S: Sample>: AsRef<[S]> + AsMut<[S]> { }
+pub trait Buf<S>: AsRef<[S]> + AsMut<[S]> { }
 
-impl<S: Sample, T: Buf<S>> AudioBuf<S, T>
+impl<S, T: Buf<S>> AudioBuf<S, T>
 {
     /// create a new audio buffer from its raw parts
     pub fn new(samples: T, channel_count: usize, sample_rate: u32) -> Self
@@ -58,4 +58,4 @@ impl<S: Sample, T: Buf<S>> AudioBuf<S, T>
 }
 
 /// blanket implementation
-impl<S: Sample, C: AsRef<[S]> + AsMut<[S]>> Buf<S> for C { }
+impl<S, C: AsRef<[S]> + AsMut<[S]>> Buf<S> for C { }

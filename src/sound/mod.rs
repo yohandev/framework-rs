@@ -20,14 +20,13 @@
 //!                             // and playback simultaneously
 //! ```
 
+mod sample;
 mod write;
 mod clip;
 mod buf;
 mod ctx;
 
-pub use write::StreamWriter;
 pub use clip::Clip;
 pub use buf::AudioBuf;
-pub use ctx::AudioCtx;
 
 pub use cpal::Sample;
