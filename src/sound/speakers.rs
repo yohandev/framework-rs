@@ -98,6 +98,15 @@ impl Speakers
     {
         self.smpt
     }
+
+    /// change the track currently playing
+    pub fn play(&self, track: impl AnySampleIterator + Send + Sync + 'static)
+    {
+        self.curr.0
+            .lock()
+            .unwrap()
+            .replace(Box::new(track));
+    }
 }
 
 // /// tests that Audio is still Send + Sync(remove this once impl is done)

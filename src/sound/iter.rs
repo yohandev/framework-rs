@@ -14,7 +14,7 @@ pub trait SampleIterator
 
 /// abstraction over `SampleIterator` to permit dynamic
 /// types
-pub(crate) trait AnySampleIterator
+pub trait AnySampleIterator
 {
     /// write `self`'s next sample directly to the stream.
     /// assume `stream` starts at the correct cursor(index 0)
