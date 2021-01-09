@@ -52,7 +52,6 @@ impl Speakers
             .default_output_config()
             .map_err(|e| SpeakersErr::DefaultStreamConfigError(e))?;
         let smpf = conf.sample_format();
-        let smps = smpf.sample_size();
         let smpt = smpf.into();
         let conf = conf.into();
         let e_fn = |e| eprintln!("an error occured on stream: {}", e);
@@ -70,30 +69,15 @@ impl Speakers
                 track = Some(new);
             }
 
-            // &mut [u8] of samples
-            let mut bytes = data.bytes_mut();
-
             // write
             if let Some(curr) = &mut track
             {
                 // TODO: do something with whether track is done or not
-                let _done = loop
-                {
-                    // done with stream segment but not track
-                    if bytes.is_empty() { break false; }
-
-                    // write next sample, check if done
-                    if curr.write_next_sample(bytes, smpt) { break true; }
-
-                    // next iteration
-                    bytes = &mut bytes[smps..];
-                };
+                curr.write_samples(data.bytes_mut(), smpt);
             }
             // (temporary) silence
             else
             {
-                drop(bytes);
-
                 fn silence<T: crate::sound::Sample>(data: &mut cpal::Data)
                 {
                     data
