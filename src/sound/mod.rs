@@ -24,11 +24,9 @@ mod speakers;
 mod silence;
 mod sample;
 mod track;
-mod clip;
-mod buf;
+mod file;
 
 pub use speakers::Speakers;
 pub use sample::{ Sample, SampleType };
 pub use track::Track;
-pub use clip::Clip;
-pub use buf::AudioBuf;
+pub use file::SoundFile;
