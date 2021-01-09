@@ -60,7 +60,7 @@ impl Speakers
         // track next-up(send, recv)
         let (send, recv) = channel();
         
-        let _stream = devc.build_output_stream_raw(&conf, smpf, move |data, _|
+        let _stream = devc.build_output_stream_raw(&conf, smpf, move |stream, _|
         {
             // check for new track
             if let Ok(new) = recv.try_recv()
@@ -71,13 +71,16 @@ impl Speakers
             // write
             if let Some(curr) = &mut track
             {
-                // TODO: do something with whether track is done or not
-                curr.write_samples(data.bytes_mut(), smpt);
+                // check if done
+                if curr.write_samples(stream.bytes_mut(), smpt)
+                {
+                    track = None;
+                }
             }
             // silence
             else
             {
-                silence::write_silence(data, smpt);
+                silence::write_silence(stream, smpt);
             }
 
         }, e_fn).map_err(|e| SpeakersErr::BuildStreamError(e))?;
