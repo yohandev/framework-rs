@@ -2,7 +2,7 @@ use crate::sound::{ Sample, SampleType };
 
 /// an iterator that specifically yields samples to be
 /// written to an audio output stream
-pub trait SampleIterator: Send + Sync + 'static
+pub trait Track: Send + Sync + 'static
 {
     /// format of the sample returned by this iterator
     type Format: Sample;
@@ -12,21 +12,23 @@ pub trait SampleIterator: Send + Sync + 'static
     fn next_sample(&mut self) -> Option<Self::Format>;
 }
 
-/// abstraction over `SampleIterator` to permit dynamic
-/// types
-pub trait AnySampleIterator: Send + Sync + 'static
+/// abstraction over `Track` to permit dynamic
+/// types. it works directly with bytes and
+/// has access to the entire stream segment, rather
+/// than working like an iterator
+pub trait RawTrack: Send + Sync + 'static
 {
     /// write `self`'s next sample directly to the stream.
-    /// keep on writing until either `self as SampleIterator`
+    /// keep on writing until either `self as Track`
     /// is exhausted or the end of `stream` is reached.
     ///
     /// assumes `stream % sizeof(format) == 0`
     ///
-    /// returns `true` if `self as SampleIterator` is done
+    /// returns `true` if `self as Track` is done
     fn write_samples(&mut self, stream: &mut [u8], format: SampleType) -> bool;
 }
 
-impl<S: Sample, T: SampleIterator<Format = S>> AnySampleIterator for T
+impl<S: Sample, T: Track<Format = S>> RawTrack for T
 {
     fn write_samples(&mut self, mut stream: &mut [u8], format: SampleType) -> bool
     {

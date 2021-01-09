@@ -1,6 +1,6 @@
 use std::sync::mpsc::{ channel, Sender };
 
-use crate::sound::{ SampleType, silence, iter };
+use crate::sound::{ SampleType, silence, track };
 
 /// output endpoint for audio
 pub struct Speakers
@@ -9,13 +9,13 @@ pub struct Speakers
     _stream: cpal::Stream,
 
     /// send tracks to the audio thread to play
-    send: Sender<Track>,
+    send: Sender<DynTrack>,
     /// config: (s)a(mp)le (t)ype
     smpt: SampleType,
 }
 
 /// sample iterator now playing
-type Track = Box<dyn iter::AnySampleIterator>;
+type DynTrack = Box<dyn track::RawTrack>;
 
 /// errors that could occur upon speakers creation
 #[derive(Debug)]
@@ -56,7 +56,7 @@ impl Speakers
         let e_fn = |e| eprintln!("an error occured on stream: {}", e);
         
         // track now playing
-        let mut track = Option::<Track>::None;
+        let mut track = Option::<DynTrack>::None;
         // track next-up(send, recv)
         let (send, recv) = channel();
         
@@ -95,7 +95,7 @@ impl Speakers
     }
 
     /// change the track currently playing
-    pub fn play(&self, track: impl iter::AnySampleIterator)
+    pub fn play(&self, track: impl track::RawTrack)
     {
         self.send
             .send(Box::new(track))

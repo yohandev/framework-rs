@@ -23,12 +23,12 @@
 mod speakers;
 mod silence;
 mod sample;
-mod iter;
+mod track;
 mod clip;
 mod buf;
 
 pub use speakers::Speakers;
 pub use sample::{ Sample, SampleType };
-pub use iter::SampleIterator;
+pub use track::Track;
 pub use clip::Clip;
 pub use buf::AudioBuf;
