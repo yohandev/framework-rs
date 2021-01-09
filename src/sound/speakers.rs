@@ -1,4 +1,4 @@
-use std::sync::{ Arc, Mutex };
+use std::sync::mpsc::{ channel, Sender };
 
 use super::iter::AnySampleIterator;
 use crate::sound::SampleType;
@@ -9,15 +9,17 @@ pub struct Speakers
     /// internal cpal output stream
     _stream: cpal::Stream,
 
-    /// track currently playing
-    curr: Arc<Track>,
+    /// send tracks to the audio thread to play
+    send: Sender<NowPlaying>,
     /// config: (s)a(mp)le (t)ype
     smpt: SampleType,
 }
 
 /// sample iterator that could (or not) exist
-#[derive(Default)]
-struct Track(Mutex<Option<Box<dyn AnySampleIterator + Send + Sync>>>);
+// #[derive(Default)]
+// struct Track(Mutex<Option<Box<dyn AnySampleIterator + Send + Sync>>>);
+
+type NowPlaying = Box<dyn AnySampleIterator + Send + Sync>;
 
 /// errors that could occur upon speakers creation
 #[derive(Debug)]
@@ -44,6 +46,7 @@ impl Speakers
     /// tldr; play some sound!
     pub fn new() -> Result<Self, SpeakersErr>
     {
+        // cpal init
         let host = cpal::default_host();
         let devc = host
             .default_output_device()
@@ -55,24 +58,26 @@ impl Speakers
         let smps = smpf.sample_size();
         let smpt = smpf.into();
         let conf = conf.into();
-
-        let curr = Default::default();
-
-        // TODO: change crash behaviour
         let e_fn = |e| eprintln!("an error occured on stream: {}", e);
-        // let w_fn = |data, _|
-        // {
-
-        // };
-
-        let track: Arc<Track> = Arc::clone(&curr);
+        
+        // track now playing
+        let mut track = Option::<NowPlaying>::None;
+        // track next-up(send, recv)
+        let (send, recv) = channel();
+        
         let _stream = devc.build_output_stream_raw(&conf, smpf, move |data, _|
         {
+            // check for new track
+            if let Ok(new) = recv.try_recv()
+            {
+                track = Some(new);
+            }
+
             // &mut [u8] of samples
             let mut bytes = data.bytes_mut();
 
             // write
-            if let Some(curr) = &mut *track.0.lock().unwrap()
+            if let Some(curr) = &mut track
             {
                 // TODO: do something with whether track is done or not
                 let _done = loop
@@ -90,7 +95,7 @@ impl Speakers
 
         }, e_fn).map_err(|e| SpeakersErr::BuildStreamError(e))?;
 
-        Ok(Self { _stream, curr, smpt })
+        Ok(Self { _stream, send, smpt })
     }
 
     /// the type of samples used by these speakers
@@ -102,10 +107,9 @@ impl Speakers
     /// change the track currently playing
     pub fn play(&self, track: impl AnySampleIterator + Send + Sync + 'static)
     {
-        self.curr.0
-            .lock()
-            .unwrap()
-            .replace(Box::new(track));
+        self.send
+            .send(Box::new(track))
+            .unwrap();
     }
 }
 
