@@ -1,10 +1,13 @@
-use super::iter::AnySampleIterator;
+use super::{SampleType, iter::AnySampleIterator};
 
 /// output endpoint for audio
 pub struct Speakers
 {
     /// track currently playing
     cur: Track,
+
+    /// config: (s)a(mp)le (t)ype
+    smpt: SampleType,
 }
 
 /// sample iterator that could (or not) exist
@@ -27,7 +30,7 @@ impl Speakers
     /// endpoint, and starts an output stream
     ///
     /// tldr; play some sound!
-    fn new() -> Result<Self, SpeakersErr>
+    pub fn new() -> Result<Self, SpeakersErr>
     {
         use cpal::traits::*;
 
@@ -38,8 +41,17 @@ impl Speakers
         let conf = devc
             .default_output_config()
             .map_err(|e| SpeakersErr::DefaultStreamConfigError(e))?;
-        
-        Ok(Self { cur: None })
+        let smpt = conf
+            .sample_format()
+            .into();
+
+        Ok(Self { cur: None, smpt })
+    }
+
+    /// the type of samples used by these speakers
+    pub fn sample_type(&self) -> SampleType
+    {
+        self.smpt
     }
 }
 
