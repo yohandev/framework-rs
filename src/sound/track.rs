@@ -10,6 +10,10 @@ pub trait Track: Send + Sync + 'static
     /// get the next sample (and?) increment self for
     /// the next iteration
     fn next_sample(&mut self) -> Option<Self::Format>;
+
+    /// called once whenever this track is passed to a
+    /// `Speakers` instance
+    fn tune(&mut self, channels: usize, sample_rate: usize);
 }
 
 /// abstraction over `Track` to permit dynamic
@@ -26,6 +30,10 @@ pub trait RawTrack: Send + Sync + 'static
     ///
     /// returns `true` if `self as Track` is done
     fn write_samples(&mut self, stream: &mut [u8], format: SampleType) -> bool;
+
+    /// called once whenever this track is passed to a
+    /// `Speakers` instance
+    fn tune(&mut self, channels: usize, sample_rate: usize);
 }
 
 impl<S: Sample, T: Track<Format = S>> RawTrack for T
@@ -68,5 +76,10 @@ impl<S: Sample, T: Track<Format = S>> RawTrack for T
             I16 => write_samples!(to_i16, 2),
             U16 => write_samples!(to_u16, 2),
         }
+    }
+
+    fn tune(&mut self, channels: usize, sample_rate: usize)
+    {
+        Track::tune(self, channels, sample_rate);
     }
 }

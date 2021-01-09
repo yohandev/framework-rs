@@ -52,19 +52,26 @@ impl Speakers
             .map_err(|e| SpeakersErr::DefaultStreamConfigError(e))?;
         let smpf = conf.sample_format();
         let smpt = smpf.into();
-        let conf = conf.into();
+        let conf = cpal::StreamConfig::from(conf);
         let e_fn = |e| eprintln!("an error occured on stream: {}", e);
         
+        // conf
+        let chnl = conf.channels as usize;
+        let smpr = conf.sample_rate.0 as usize;
+
         // track now playing
         let mut track = Option::<DynTrack>::None;
         // track next-up(send, recv)
-        let (send, recv) = channel();
+        let (send, recv) = channel::<DynTrack>();
         
         let _stream = devc.build_output_stream_raw(&conf, smpf, move |stream, _|
         {
             // check for new track
-            if let Ok(new) = recv.try_recv()
+            if let Ok(mut new) = recv.try_recv()
             {
+                // tune
+                new.tune(chnl, smpr);
+                // set track
                 track = Some(new);
             }
 
