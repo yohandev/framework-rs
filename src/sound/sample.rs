@@ -30,7 +30,9 @@ impl Sample for f32
     const SILENCE: Self = 0.0;
     const TYPE: SampleType = SampleType::F32;
 
+    #[inline]
     fn to_f32(self) -> f32 { self }
+    #[inline]
     fn to_i16(self) -> i16
     {
         match self >= 0.0
@@ -39,6 +41,7 @@ impl Sample for f32
             false => (-self * i16::MIN as f32) as i16,
         }
     }
+    #[inline]
     fn to_u16(self) -> u16
     {
         (((self + 1.0) * 0.5) * u16::MAX as f32).round() as u16
@@ -50,6 +53,7 @@ impl Sample for i16
     const SILENCE: Self = 0;
     const TYPE: SampleType = SampleType::I16;
 
+    #[inline]
     fn to_f32(self) -> f32
     {
         match self < 0
@@ -58,7 +62,9 @@ impl Sample for i16
             false => self as f32 / i16::MAX as f32,
         }
     }
+    #[inline]
     fn to_i16(self) -> i16 { self }
+    #[inline]
     fn to_u16(self) -> u16 { self.wrapping_add(-0x8000) as u16 }
 }
 
@@ -67,7 +73,11 @@ impl Sample for u16
     const SILENCE: Self = 0x8000;
     const TYPE: SampleType = SampleType::U16;
 
+    #[inline]
     fn to_f32(self) -> f32 { self.to_i16().to_f32() }
+    #[inline]
     fn to_i16(self) -> i16 { self.wrapping_add(0x8000) as i16 }
+
+    #[inline]
     fn to_u16(self) -> u16 { self }
 }
