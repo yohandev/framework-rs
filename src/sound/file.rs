@@ -16,7 +16,8 @@ pub struct SoundFile<S: Sample>
     sample_rate: usize,
 }
 
-struct SoundFileTrack<S: Sample>
+/// the `Track` implementation for `SoundFile`
+pub struct SoundFileTrack<S: Sample>
 {
     /// this audio file's interleaved samples
     samples: Arc<[S]>,
@@ -84,13 +85,26 @@ impl<S: Sample> SoundFile<S>
         self.samples
             .chunks_exact(self.channels)
     }
+
+    /// turn this `SoundFile` into a `Track`
+    pub fn track(&self) -> SoundFileTrack<S>
+    {
+        SoundFileTrack
+        {
+            samples: self.samples.clone(),
+            channels: self.channels,
+            index: 0,
+            sampler: samplers::identity::<S>,
+            sampler_cache: 0
+        }
+    }
 }
 
 impl<S: Sample> Track for SoundFileTrack<S>
 {
     type Format = S;
 
-    fn next_sample(&mut self) -> Option<Self::Format>
+    fn next_sample(&mut self) -> Option<S>
     {
         // done
         if self.index == self.samples.len()
@@ -126,7 +140,7 @@ impl<S: Sample> Track for SoundFileTrack<S>
                 samplers::copy::<S>
             }
             // ???
-            (_, _) => panic!("not implemented!")
+            (_, _) => unimplemented!()
         };
         // reset index
         self.index = 0;
@@ -169,14 +183,10 @@ mod samplers
     /// one audio file channel, `$arg3` output channels
     pub fn copy<S: Sample>(samples: &[S], index: &mut usize, channels: &mut usize) -> S
     {
-        // only increment if on next frame
-        if *index % *channels == 0
-        {
-            // increment
-            *index += 1;
-        }
+        // increment
+        *index += 1;
 
         // next sample
-        samples[*index - 1]
+        samples[*index - ((*index - 1) % *channels)]
     }
 }
