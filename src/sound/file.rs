@@ -73,14 +73,32 @@ impl<S: Sample> SoundFile<S>
         self.sample_rate
     }
 
+    /// number of samples in this file
+    pub fn samples_len(&self) -> usize
+    {
+        self.samples.len()
+    }
+
+    /// number of frames in this audio file
+    pub fn frames_len(&self) -> usize
+    {
+        self.samples.len() / self.channels
+    }
+
+    /// get this audio file's interleaved samples
+    pub fn samples(&self) -> &[S]
+    {
+        &self.samples
+    }
+
     /// iterate this audio file's interleaved samples
-    pub fn samples(&self) -> impl Iterator<Item = &S>
+    pub fn iter_samples(&self) -> impl Iterator<Item = &S>
     {
         self.samples.iter()
     }
 
     /// iterate this audio file's frames
-    pub fn frames(&self) -> impl Iterator<Item = &[S]>
+    pub fn iter_frames(&self) -> impl Iterator<Item = &[S]>
     {
         self.samples
             .chunks_exact(self.channels)
