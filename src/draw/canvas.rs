@@ -1,4 +1,4 @@
-use crate::Bitmap;
+use crate::draw::Bitmap;
 
 /// represents a framebuffer, which does everything a [Bitmap]
 /// can while drawing to the screen

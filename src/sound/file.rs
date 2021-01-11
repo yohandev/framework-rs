@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
-use crate::sound::sample::Sample;
-use crate::Track;
+use crate::sound::{ Sample, Track };
 
 /// represents a sound file that can be loaded at
 /// runtime

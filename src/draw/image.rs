@@ -2,8 +2,8 @@ use image::{ GenericImageView, ImageError };
 
 use std::path::Path;
 
-use crate::Bitmap;
-use crate::Extent2;
+use crate::math::Extent2;
+use crate::draw::Bitmap;
 
 /// represents an image, which does everything a [Bitmap]
 /// can

@@ -8,7 +8,8 @@ use winit::window::WindowBuilder;
 use winit::dpi::LogicalSize;
 use winit::event::Event;
 
-use crate::Sketch;
+use crate::core::{ Sketch, Time };
+use crate::draw::Frame;
 
 /// run the sketch, hyjacking the main thread until the
 /// window is closed
