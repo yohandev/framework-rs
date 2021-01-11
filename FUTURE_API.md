@@ -51,7 +51,18 @@ impl Sketch for Foo
         app.mouse().down(Mouse::R); // same deal as keys
         app.mouse().x();            // position in pixels
 
-
+        if app.keys().pressed(Key::Space)
+        {
+            app.audio().play(&self.song);
+        }
+        else if app.keys().pressed(Key::Backspace)
+        {
+            app.audio().pause(&self.song);
+        }
+        else if app.keys().pressed(Key::P)
+        {
+            app.audio().resume(&self.song);
+        }
     }
 
     // called exactly when a key is pressed.
