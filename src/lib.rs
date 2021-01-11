@@ -1,6 +1,7 @@
 mod bitmap;
 mod frame;
 mod time;
+mod step;
 mod img;
 mod app;
 
@@ -10,6 +11,7 @@ pub mod util;
 pub use bitmap::Bitmap;
 pub use frame::Frame;
 pub use time::Time;
+pub use step::Step;
 pub use img::Image;
 pub use app::App;
 
