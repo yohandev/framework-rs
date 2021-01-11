@@ -4,7 +4,7 @@ use winit::event_loop::EventLoopWindowTarget;
 
 use pixels::{ Pixels, SurfaceTexture };
 
-use crate::draw::{ Canvas, CanvasId, Bitmap };
+use crate::draw::{ Canvas, Bitmap };
 use crate::math::Extent2;
 
 /// represents a window and a pixel buffer
@@ -56,7 +56,7 @@ impl Window
         Canvas
         {
             inner: Bitmap::new(buf, self.size),
-            id: CanvasId(self.winit.id()),
+            window: &self.winit,
         }
     }
 }

@@ -1,10 +1,11 @@
+use std::collections::HashMap;
+
 use pixels::{ Pixels, SurfaceTexture };
 
 use winit_input_helper::WinitInputHelper;
 
 use winit::event_loop::{ ControlFlow, EventLoop };
-use winit::window::WindowBuilder;
-use winit::dpi::LogicalSize;
+use winit::window::WindowId;
 use winit::event::Event;
 
 use crate::core::{ Sketch, Time, window::Window };
@@ -17,6 +18,9 @@ pub fn run<T: Sketch>()
     // create event loop
     let events = EventLoop::new();
 
+    // windows
+    let mut windows = HashMap::<WindowId, Window>::new();
+
     // inputs
     let mut input = WinitInputHelper::new();
     let mut time = Time::new();
@@ -27,13 +31,13 @@ pub fn run<T: Sketch>()
     events.run(move |evt, _, control_flow|
     {
         // draw the current frame
-        if let Event::RedrawRequested(_) = evt
+        if let Event::RedrawRequested(id) = evt
         {
             // get the frame
-            let mut frame = Canvas::new(pixels.get_frame(), T::SIZE);
+            let window = windows[&id];
             
             // update buffer
-            state.draw(&mut frame);
+            state.draw(&mut window.get_frame());
 
             // render
             if pixels.render().is_err()
