@@ -5,3 +5,10 @@ use crate::draw::Bitmap;
 ///
 /// [Bitmap]: crate::Bitmap
 pub type Canvas<'a> = Bitmap<&'a mut [u8]>;
+
+/// unique identifier for each [Canvas], and,
+/// thereby each window
+/// 
+/// [Canvas]: crate::draw::Canvas
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct CanvasId(winit::window::WindowId);

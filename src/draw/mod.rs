@@ -1,9 +1,9 @@
-mod bitmap;
 mod canvas;
+mod bitmap;
 mod image;
 
+pub use self::canvas::{ Canvas, CanvasId };
 pub use self::bitmap::{ Bitmap, Buf };
-pub use self::canvas::Canvas;
 pub use self::image::Image;
 
 pub use rayon::prelude::ParallelIterator;
