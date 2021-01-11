@@ -1,6 +1,5 @@
 mod bitmap;
 mod frame;
-mod math2;
 mod time;
 mod img;
 mod app;
