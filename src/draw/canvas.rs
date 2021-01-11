@@ -4,4 +4,4 @@ use crate::draw::Bitmap;
 /// can while drawing to the screen
 ///
 /// [Bitmap]: crate::Bitmap
-pub type Frame<'a> = Bitmap<&'a mut [u8]>;
+pub type Canvas<'a> = Bitmap<&'a mut [u8]>;

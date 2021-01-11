@@ -30,6 +30,6 @@ pub mod prelude
     {
         ParallelIterator,
         Bitmap,
-        Frame,
+        Canvas,
     };
 }

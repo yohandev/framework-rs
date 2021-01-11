@@ -9,7 +9,7 @@ use winit::dpi::LogicalSize;
 use winit::event::Event;
 
 use crate::core::{ Sketch, Time };
-use crate::draw::Frame;
+use crate::draw::Canvas;
 
 /// run the sketch, hyjacking the main thread until the
 /// window is closed
@@ -45,7 +45,7 @@ pub fn run<T: Sketch>()
         if let Event::RedrawRequested(_) = evt
         {
             // get the frame
-            let mut frame = Frame::new(pixels.get_frame(), T::SIZE);
+            let mut frame = Canvas::new(pixels.get_frame(), T::SIZE);
             
             // update buffer
             state.draw(&mut frame);

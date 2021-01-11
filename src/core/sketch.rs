@@ -1,4 +1,4 @@
-use crate::draw::Frame;
+use crate::draw::Canvas;
 use crate::core::App;
 
 /// represents a sketch that can be run by the framework
@@ -11,7 +11,7 @@ pub trait Sketch: 'static
     /// draw on the given `Canvas`. This method
     /// is called for every existing canvas on
     /// every frame
-    fn draw(&mut self, c: &mut Frame)
+    fn draw(&mut self, c: &mut Canvas)
     {
         c.clear(Default::default());
     }
