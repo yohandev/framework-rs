@@ -1,4 +1,4 @@
-use crate::sound::{ Sample, SampleType };
+use crate::sound::sample::{ Sample, SampleType };
 
 /// an iterator that specifically yields samples to be
 /// written to an audio output stream

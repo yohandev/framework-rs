@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use super::{ Sample, Track };
+use crate::sound::sample::Sample;
+use crate::Track;
 
 /// represents a sound file that can be loaded at
 /// runtime
@@ -169,7 +170,7 @@ impl<S: Sample> Track for SoundFileTrack<S>
 /// specifications to the `Speakers` output stream
 mod samplers
 {
-    use crate::sound::Sample;
+    use crate::sound::sample::Sample;
 
     /// same number of channels in file as output
     pub fn identity<S: Sample>(samples: &[S], index: &mut usize, _: &mut usize) -> S

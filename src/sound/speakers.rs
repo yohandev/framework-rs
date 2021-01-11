@@ -1,6 +1,7 @@
 use std::sync::mpsc::{ channel, Sender };
 
-use crate::sound::{ SampleType, silence, track };
+use crate::sound::sample::SampleType;
+use crate::sound::{ silence, track };
 
 /// output endpoint for audio
 pub struct Speakers

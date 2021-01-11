@@ -1,4 +1,4 @@
-use crate::sound::{ SampleType, Sample };
+use crate::sound::sample::{ SampleType, Sample };
 
 /// writes the silence value everywhere in the
 /// provided `stream`
