@@ -51,7 +51,7 @@ impl<'a> Canvas<'a>
         CanvasId(self.window.id())
     }
 
-    /// get the window this canvas is rendered to
+    /// get the winit window this canvas is rendered to
     pub fn window(&self) -> &WinitWindow
     {
         self.window

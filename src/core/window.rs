@@ -12,7 +12,7 @@ use crate::math::Extent2;
 pub struct Window
 {
     /// pixels buffer
-    pixels: Pixels<WinitWindow>,
+    pub pixels: Pixels<WinitWindow>,
     /// winit window
     winit: WinitWindow,
     /// pixel buffer size, in pixels
@@ -49,7 +49,7 @@ impl Window
     }
 
     /// get the next canvas to draw to
-    pub(crate) fn get_frame(&mut self) -> Canvas
+    pub fn get_frame(&mut self) -> Canvas
     {
         let buf = self.pixels.get_frame();
         

@@ -40,10 +40,9 @@ pub fn run<T: Sketch>()
             state.draw(&mut window.get_frame());
 
             // render
-            if pixels.render().is_err()
+            if window.pixels.render().is_err()
             {
-                *control_flow = ControlFlow::Exit;
-                return;
+                return *control_flow = ControlFlow::Exit;
             }
         }
 
@@ -53,8 +52,7 @@ pub fn run<T: Sketch>()
             // close events
             if input.quit()
             {
-                *control_flow = ControlFlow::Exit;
-                return;
+                return *control_flow = ControlFlow::Exit;
             }
 
             // resize the window
