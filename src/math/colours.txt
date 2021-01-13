@@ -1,0 +1,592 @@
+("teal") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,128,128)
+};
+("seagreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(46,139,87)
+};
+("honeydew") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(240,255,240)
+};
+("lemonchiffon") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,250,205)
+};
+("peru") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(205,133,63)
+};
+("darkseagreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(143,188,143)
+};
+("oldlace") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(253,245,230)
+};
+("wheat") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(245,222,179)
+};
+("lavender") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(230,230,250)
+};
+("beige") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(245,245,220)
+};
+("lightseagreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(32,178,170)
+};
+("lightslategray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(119,136,153)
+};
+("aquamarine") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(127,255,212)
+};
+("lightsalmon") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,160,122)
+};
+("aliceblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(240,248,255)
+};
+("dodgerblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(30,144,255)
+};
+("orange") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,165,0)
+};
+("crimson") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(220,20,60)
+};
+("indianred") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(205,92,92)
+};
+("fuchsia") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,0,255)
+};
+("maroon") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(128,0,0)
+};
+("palevioletred") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(219,112,147)
+};
+("peachpuff") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,218,185)
+};
+("olivedrab") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(107,142,35)
+};
+("darkslategray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(47,79,79)
+};
+("blue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,0,255)
+};
+("paleturquoise") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(175,238,238)
+};
+("lightslategrey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(211,211,211)
+};
+("cornflowerblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(100,149,237)
+};
+("royalblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(65,105,225)
+};
+("yellow") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,255,0)
+};
+("olive") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(128,128,0)
+};
+("steelblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(70,130,180)
+};
+("palegreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(152,251,152)
+};
+("darkviolet") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(148,0,211)
+};
+("mediumorchid") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(186,85,211)
+};
+("darkblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,0,139)
+};
+("tan") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(210,180,140)
+};
+("mediumpurple") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(147,112,219)
+};
+("brown") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(165,42,42)
+};
+("gray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(128,128,128)
+};
+("midnightblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(25,25,112)
+};
+("palegoldenrod") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(238,232,170)
+};
+("mistyrose") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,228,225)
+};
+("mediumvioletred") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(199,21,133)
+};
+("gold") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,215,0)
+};
+("turquoise") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(64,224,208)
+};
+("dimgrey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(105,105,105)
+};
+("lawngreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(124,252,0)
+};
+("darkolivegreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(85,107,47)
+};
+("aqua") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,255,255)
+};
+("gainsboro") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(220,220,220)
+};
+("darkgreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,100,0)
+};
+("ivory") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,255,240)
+};
+("lavenderblush") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,240,245)
+};
+("rosybrown") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(188,143,143)
+};
+("lightsteelblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(176,196,222)
+};
+("azure") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(240,255,255)
+};
+("indigo") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(75,0,130)
+};
+("cyan") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,255,255)
+};
+("lightgrey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(211,211,211)
+};
+("darkkhaki") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(189,183,107)
+};
+("blanchedalmond") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,235,205)
+};
+("limegreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(50,205,50)
+};
+("darkorchid") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(153,50,204)
+};
+("darksalmon") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(233,150,122)
+};
+("salmon") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(250,128,114)
+};
+("floralwhite") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,250,240)
+};
+("lightyellow") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,255,224)
+};
+("moccasin") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,228,181)
+};
+("plum") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(221,160,221)
+};
+("white") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,255,255)
+};
+("blueviolet") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(138,43,226)
+};
+("darkslategrey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(47,79,79)
+};
+("springgreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,255,127)
+};
+("forestgreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(34,139,34)
+};
+("khaki") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(240,230,140)
+};
+("thistle") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(216,191,216 )
+};
+("slategray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(112,128,144)
+};
+("chartreuse") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(127,255,0)
+};
+("lightgray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(211,211,211)
+};
+("sienna") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(160,82,45)
+};
+("skyblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(135,206,235)
+};
+("rebeccapurple") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(102,51,153)
+};
+("goldenrod") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(218,165,32)
+};
+("lime") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,255,0)
+};
+("deeppink") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,20,147)
+};
+("cadetblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(95,158,160)
+};
+("greenyellow") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(173,255,47)
+};
+("navajowhite") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,222,173)
+};
+("lightpink") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,182,193)
+};
+("darkturquoise") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,206,209)
+};
+("darkmagenta") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(139,0,139)
+};
+("purple") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(128,0,128)
+};
+("lightskyblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(135,206,250)
+};
+("black") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,0,0)
+};
+("sandybrown") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(244,164,96)
+};
+("lightblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(173,216,230)
+};
+("bisque") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,228,196)
+};
+("orchid") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(218,112,214)
+};
+("mediumaquamarine") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(102,205,170)
+};
+("burlywood") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(222,184,135)
+};
+("orangered") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,69,0)
+};
+("violet") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(238,130,238)
+};
+("mediumblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,0,205)
+};
+("mediumseagreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(60,179,113)
+};
+("darkgray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(169,169,169)
+};
+("powderblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(176,224,230)
+};
+("mediumturquoise") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(72,209,204)
+};
+("whitesmoke") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(245,245,245)
+};
+("red") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,0,0)
+};
+("papayawhip") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,239,213)
+};
+("mediumslateblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(123,104,238)
+};
+("darkorange") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,140,0)
+};
+("silver") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(192,192,192)
+};
+("green") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,128,0)
+};
+("chocolate") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(210,105,30)
+};
+("darkred") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(139,0,0)
+};
+("pink") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,192,203)
+};
+("darkslateblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(72,61,139)
+};
+("seashell") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,245,238)
+};
+("antiquewhite") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(250,235,215)
+};
+("hotpink") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,105,180)
+};
+("slategrey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(112,128,144)
+};
+("lightgreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(144,238,144)
+};
+("snow") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,250,250)
+};
+("yellowgreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(154,205,50)
+};
+("saddlebrown") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(139,69,19)
+};
+("lightcyan") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(224,255,255)
+};
+("deepskyblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,191,255)
+};
+("cornsilk") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,248,220)
+};
+("magenta") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,0,255)
+};
+("mintcream") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(245,255,250)
+};
+("ghostwhite") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(248,248,255)
+};
+("firebrick") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(178,34,34)
+};
+("lightgoldenrodyellow") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(250,250,210)
+};
+("lightcoral") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(240,128,128)
+};
+("darkcyan") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,139,139)
+};
+("tomato") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,99,71)
+};
+("navy") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,0,128)
+};
+("mediumspringgreen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(0,250,154)
+};
+("linen") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(250,240,230)
+};
+("slateblue") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(106,90,205)
+};
+("darkgoldenrod") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(184,134,11)
+};
+("dimgray") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(105,105,105)
+};
+("coral") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(255,127,80)
+};
+("darkgrey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(169,169,169)
+};
+("grey") =>
+{
+    framework::math::Rgba::<u8>::new_opaque(80, 80, 80)
+};

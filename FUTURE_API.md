@@ -25,7 +25,7 @@ impl Sketch for Foo
     {
         c.background(Rgba::BLACK);
 
-        c.stroke(Rgba::BLUE);
+        c.stroke(c!("blue"));
         c.line(v![0, 0], v![20, 40]);
 
         c.fill(c![0x23, 0xff, 0x12, 0xff]);

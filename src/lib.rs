@@ -47,6 +47,8 @@ pub mod prelude
     //     lines,
     //     triangle
     // };
+    // macros...
+    pub use crate::{ c, v };
 }
 
 // run the sketch, hyjacking the main thread until all the
