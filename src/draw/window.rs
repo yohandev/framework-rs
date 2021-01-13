@@ -33,7 +33,7 @@ impl Window
             .build(target)
             .unwrap();
 
-        let mut pixels =
+        let pixels =
         {
             let PhysicalSize { width, height } = winit.inner_size();
 

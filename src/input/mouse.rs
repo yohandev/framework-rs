@@ -74,7 +74,7 @@ impl Mouse
                 self.del = pos - self.pos;
                 self.pos = pos;
             }
-            WindowEvent::MouseWheel { delta, phase, .. } =>
+            WindowEvent::MouseWheel { delta, .. } =>
             {
                 use winit::event::MouseScrollDelta;
 
