@@ -212,6 +212,34 @@ impl<T: Buf> Bitmap<T>
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
     }
 
+    /// get the current fill colour
+    #[inline]
+    pub fn fill(&self) -> Rgba<u8>
+    {
+        self.fill
+    }
+
+    /// set the fill colour to be used for any future drawing calls
+    #[inline]
+    pub fn set_fill(&mut self, col: Rgba<u8>)
+    {
+        self.fill = col;
+    }
+
+    /// get the current stroke colour
+    #[inline]
+    pub fn stroke(&self) -> Rgba<u8>
+    {
+        self.stroke
+    }
+
+    /// set the stroke colour to be used for any future drawing calls
+    #[inline]
+    pub fn set_stroke(&mut self, col: Rgba<u8>)
+    {
+        self.stroke = col;
+    }
+
     /// fills this entire bitmap with a color. this is much more efficient
     /// than iterating through the pixels and individually setting their
     /// colors.

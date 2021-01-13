@@ -42,6 +42,7 @@ pub mod prelude
     pub use crate::
     {
         background,
+        fill
     };
 }
 
