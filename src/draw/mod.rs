@@ -1,3 +1,5 @@
+pub mod macros;
+
 mod canvas;
 mod bitmap;
 mod window;

@@ -30,13 +30,18 @@ pub mod prelude
         ParallelIterator,
         Image,
         Canvas,
-        CanvasId
+        CanvasId,
     };
     pub use crate::
     {
         run,
         Sketch,
         App
+    };
+    // macros...
+    pub use crate::
+    {
+        background,
     };
 }
 
