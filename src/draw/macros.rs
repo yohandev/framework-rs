@@ -96,3 +96,18 @@ macro_rules! lines
         $($canvas.line(framework::math::Vec2::new($ax, $ay), framework::math::Vec2::new($bx, $by)));*
     };
 }
+
+/// draws a triangle with vertices `a`, `b`, and `c`, clipping
+/// any pixels out of bounds.
+#[macro_export]
+macro_rules! triangle
+{
+    ($canvas:expr, [$ax:expr, $ay:expr], [$bx:expr, $by:expr], [$cx:expr, $cy:expr]) =>
+    {
+        $canvas.triangle(
+            framework::math::Vec2::new($ax, $ay),
+            framework::math::Vec2::new($bx, $by),
+            framework::math::Vec2::new($cx, $cy),
+        )
+    };
+}

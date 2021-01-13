@@ -45,6 +45,7 @@ pub mod prelude
         stroke,
         fill,
         lines,
+        triangle
     };
 }
 

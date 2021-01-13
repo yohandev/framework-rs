@@ -26,12 +26,12 @@ impl Sketch for Foo
         lines!(c, [20, 10], [200, 100]);
 
         // draw some green lines
-        stroke!(c, (0x00, 0x00, 0xff));
+        stroke!(c, (0x00, 0xff, 0x00));
         lines!(c, ([50, 100], [0, 10]), ([60, 32], [90, 67]));
 
         // draw purple triangle with no stroke
         stroke!(c, None);
         fill!(c, (0xff, 0x00, 0xff));
-        
+        triangle!(c, [120, 200], [20, 30], [350, 300]);
     }
 }
