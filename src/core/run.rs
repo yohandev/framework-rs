@@ -2,11 +2,10 @@ use std::collections::HashMap;
 
 use winit::event_loop::{ ControlFlow, EventLoop };
 use winit::window::WindowId;
-use winit::event::Event;
 
 use crate::input::{ Input, ProcessedEvent };
-use crate::draw::{ Canvas, Window };
 use crate::core::{ Sketch, Time };
+use crate::draw::Window;
 
 /// run the sketch, hyjacking the main thread until the
 /// window is closed
@@ -23,7 +22,7 @@ pub fn run<T: Sketch>()
     let mut time = Time::new();
     
     // create state
-    let mut state = T::setup(app);
+    let mut state = T::setup(/* &mut App */);
 
     events.run(move |event, _, control_flow|
     {
