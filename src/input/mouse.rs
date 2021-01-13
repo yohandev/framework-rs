@@ -28,6 +28,18 @@ pub type MouseButton = winit::event::MouseButton;
 
 impl Mouse
 {
+    /// create a new `Mouse` instance
+    pub(super) fn new() -> Self
+    {
+        Self
+        {
+            pos: Vec2::zero(),
+            del: Vec2::zero(),
+            btn: [InputState::Up; 255],
+            scroll: Vec2::zero(),
+        }
+    }
+
     /// reset the input states within `self` to prepare for
     /// a new frame
     pub(super) fn reset(&mut self)

@@ -9,20 +9,20 @@ use crate::math::Extent2;
 
 /// represents a window and a pixel buffer
 /// attatched to its swapchain
-pub struct Window
+pub(crate) struct Window
 {
     /// pixels buffer
     pub pixels: Pixels<WinitWindow>,
     /// winit window
-    winit: WinitWindow,
+    pub winit: WinitWindow,
     /// pixel buffer size, in pixels
-    size: Extent2<usize>,
+    pub size: Extent2<usize>,
 }
 
 impl Window
 {
     /// create a new window
-    pub fn new(events: &EventLoopWindowTarget<()>, title: impl Into<String>, size: Extent2<usize>) -> Self
+    pub(crate) fn new(events: &EventLoopWindowTarget<()>, title: impl Into<String>, size: Extent2<usize>) -> Self
     {
         let logical_size = LogicalSize::new(size.w as f64, size.h as f64);
 
@@ -49,7 +49,7 @@ impl Window
     }
 
     /// get the next canvas to draw to
-    pub fn get_frame(&mut self) -> Canvas
+    pub(crate) fn get_frame(&mut self) -> Canvas
     {
         let buf = self.pixels.get_frame();
         

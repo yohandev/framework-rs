@@ -8,8 +8,8 @@ use winit::event_loop::{ ControlFlow, EventLoop };
 use winit::window::WindowId;
 use winit::event::Event;
 
-use crate::core::{ Sketch, Time, window::Window };
-use crate::draw::Canvas;
+use crate::{draw::{ Canvas, Window }, input::Input};
+use crate::core::{ Sketch, Time };
 
 /// run the sketch, hyjacking the main thread until the
 /// window is closed
@@ -22,7 +22,7 @@ pub fn run<T: Sketch>()
     let mut windows = HashMap::<WindowId, Window>::new();
 
     // inputs
-    let mut input = WinitInputHelper::new();
+    let mut input = Input::new();
     let mut time = Time::new();
     
     // create state

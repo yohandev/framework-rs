@@ -12,10 +12,10 @@ use crate::draw::Bitmap;
 pub struct Canvas<'a> 
 {
     /// pixel buffer frame
-    pub(crate) inner: Bitmap<&'a mut [u8]>,
+    pub(super) inner: Bitmap<&'a mut [u8]>,
     /// unique identifier for the window this canvas is attached
     /// to
-    pub(crate) window: &'a WinitWindow,
+    pub(super) window: &'a WinitWindow,
 }
 
 /// unique identifier for each [Canvas], and,

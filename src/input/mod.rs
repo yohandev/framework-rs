@@ -10,6 +10,7 @@ use winit::event::Event;
 /// stores raw keyboard, mouse, and [TODO] controller input.
 /// It caches physical buttons that are held or up, as well as
 /// buttons pressed or released during the duration of this frame.
+#[derive(Debug)]
 pub struct Input
 {
     /// mouse input
@@ -51,6 +52,16 @@ pub(crate) enum ProcessedEvent
 
 impl Input
 {
+    /// create a new `Input` instance
+    pub(crate) fn new() -> Self
+    {
+        Self
+        {
+            mouse: Mouse::new(),
+            keys: Keys::new(),
+        }
+    }
+
     /// process a raw incoming winit event
     pub(crate) fn process(&mut self, event: Event<()>) -> ProcessedEvent
     {

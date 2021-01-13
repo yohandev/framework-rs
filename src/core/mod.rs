@@ -1,4 +1,3 @@
-mod window;
 mod sketch;
 mod time;
 mod app;

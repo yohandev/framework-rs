@@ -17,6 +17,15 @@ pub type KeyCode = winit::event::VirtualKeyCode;
 
 impl Keys
 {
+    /// create a new `Keys` instance
+    pub(super) fn new() -> Self
+    {
+        Self
+        {
+            keys: [InputState::Up; 255],
+        }
+    }
+
     /// reset the input states within `self` to prepare for
     /// a new frame
     pub(super) fn reset(&mut self)
