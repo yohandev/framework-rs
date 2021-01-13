@@ -325,6 +325,18 @@ impl<T: Buf> Bitmap<T>
             self[pos] = self.stroke;
         }
     }
+
+    /// draws a triangle with vertices `a`, `b`, and `c`, clipping
+    /// any pixels out of bounds
+    pub fn triangle(&mut self, a: Vec2<i32>, b: Vec2<i32>, c: Vec2<i32>)
+    {
+        use crate::util::Triangle;
+
+        for (pos, _) in Triangle::new_bounded([a, b, c], self.size().as_())
+        {
+            self[pos] = self.fill;
+        }
+    }
 }
 
 /// blanket implementation
