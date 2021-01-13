@@ -15,15 +15,7 @@ macro_rules! background
     {
         $canvas.background(framework::math::Rgba::new($x, $y, $z, $w))
     };
-    ($canvas:expr, [$x:expr, $y:expr, $z:expr, $w:expr]) =>
-    {
-        $canvas.background(framework::math::Rgba::new($x, $y, $z, $w))
-    };
     ($canvas:expr, ($x:expr, $y:expr, $z:expr)) =>
-    {
-        $canvas.background(framework::math::Rgba::new($x, $y, $z, 0xff))
-    };
-    ($canvas:expr, [$x:expr, $y:expr, $z:expr]) =>
     {
         $canvas.background(framework::math::Rgba::new($x, $y, $z, 0xff))
     };
@@ -48,15 +40,7 @@ macro_rules! fill
     {
         $canvas.set_fill(Some(framework::math::Rgba::new($x, $y, $z, $w)))
     };
-    ($canvas:expr, [$x:expr, $y:expr, $z:expr, $w:expr]) =>
-    {
-        $canvas.set_fill(Some(framework::math::Rgba::new($x, $y, $z, $w)))
-    };
     ($canvas:expr, ($x:expr, $y:expr, $z:expr)) =>
-    {
-        $canvas.set_fill(Some(framework::math::Rgba::new($x, $y, $z, 0xff)))
-    };
-    ($canvas:expr, [$x:expr, $y:expr, $z:expr]) =>
     {
         $canvas.set_fill(Some(framework::math::Rgba::new($x, $y, $z, 0xff)))
     };
@@ -81,15 +65,7 @@ macro_rules! stroke
     {
         $canvas.set_stroke(Some(framework::math::Rgba::new($x, $y, $z, $w)))
     };
-    ($canvas:expr, [$x:expr, $y:expr, $z:expr, $w:expr]) =>
-    {
-        $canvas.set_stroke(Some(framework::math::Rgba::new($x, $y, $z, $w)))
-    };
     ($canvas:expr, ($x:expr, $y:expr, $z:expr)) =>
-    {
-        $canvas.set_stroke(Some(framework::math::Rgba::new($x, $y, $z, 0xff)))
-    };
-    ($canvas:expr, [$x:expr, $y:expr, $z:expr]) =>
     {
         $canvas.set_stroke(Some(framework::math::Rgba::new($x, $y, $z, 0xff)))
     };
