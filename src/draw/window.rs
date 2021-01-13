@@ -4,7 +4,7 @@ use winit::event_loop::EventLoopWindowTarget;
 
 use pixels::{ Pixels, SurfaceTexture };
 
-use crate::draw::{ Canvas, Bitmap };
+use crate::draw::{ Canvas, CanvasId, Bitmap };
 use crate::math::Extent2;
 
 /// represents a window and a pixel buffer
@@ -17,12 +17,14 @@ pub(crate) struct Window
     pub winit: WinitWindow,
     /// pixel buffer size, in pixels
     pub size: Extent2<usize>,
+    /// identifier passes to canvases
+    pub id: CanvasId,
 }
 
 impl Window
 {
     /// create a new window
-    pub(crate) fn new(target: &EventLoopWindowTarget<()>, title: impl Into<String>, size: Extent2<usize>) -> Self
+    pub(crate) fn new(target: &EventLoopWindowTarget<()>, title: impl Into<String>, size: Extent2<usize>, id: CanvasId) -> Self
     {
         let logical_size = LogicalSize::new(size.w as f64, size.h as f64);
 
@@ -44,7 +46,7 @@ impl Window
 
         Self
         {
-            pixels, winit, size
+            pixels, winit, size, id
         }
     }
 
@@ -57,6 +59,7 @@ impl Window
         {
             inner: Bitmap::new(buf, self.size),
             window: &self.winit,
+            id: self.id
         }
     }
 }

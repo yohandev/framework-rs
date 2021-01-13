@@ -1,6 +1,6 @@
 use std::ops::{ Deref, DerefMut };
 
-use winit::window::{ WindowId, Window as WinitWindow };
+use winit::window::Window as WinitWindow;
 
 use crate::draw::Bitmap;
 
@@ -13,9 +13,10 @@ pub struct Canvas<'a>
 {
     /// pixel buffer frame
     pub(super) inner: Bitmap<&'a mut [u8]>,
-    /// unique identifier for the window this canvas is attached
-    /// to
+    /// the window this canvas is attached to
     pub(super) window: &'a WinitWindow,
+    /// this canvas' ID
+    pub(super) id: CanvasId,
 }
 
 /// unique identifier for each [Canvas], and,
@@ -23,7 +24,7 @@ pub struct Canvas<'a>
 /// 
 /// [Canvas]: crate::draw::Canvas
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct CanvasId(pub(crate) WindowId);
+pub struct CanvasId(i32);
 
 impl<'a> Deref for Canvas<'a>
 {
@@ -45,15 +46,31 @@ impl<'a> DerefMut for Canvas<'a>
 
 impl<'a> Canvas<'a>
 {
-    /// get this canvas' ID
+    /// get this canvas' unique ID
+    #[inline]
     pub fn id(&self) -> CanvasId
     {
-        CanvasId(self.window.id())
+        self.id
     }
 
     /// get the winit window this canvas is rendered to
     pub fn window(&self) -> &WinitWindow
     {
         self.window
+    }
+}
+
+impl CanvasId
+{
+    /// the first canvas id
+    pub(crate) fn zero() -> Self
+    {
+        Self(0)
+    }
+
+    /// get the next CanvasId(`self + 1`)
+    pub(crate) fn next(self) -> Self
+    {
+        Self(self.0 + 1)
     }
 }

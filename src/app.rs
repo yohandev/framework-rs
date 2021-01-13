@@ -15,14 +15,18 @@ use crate::Sketch;
 pub struct App
 {
     /// input state
-    pub(super) input: Input,
+    input: Input,
     /// time state
-    pub(super) time: Time,
+    time: Time,
 
     /// windows currently open
-    pub(super) windows: HashMap::<WindowId, Window>,
+    windows: HashMap::<WindowId, Window>,
+    /// maps canvas id to window id
+    canvases: HashMap<CanvasId, WindowId>,
     /// window creation requests
-    pub(super) requests: Vec<(String, Extent2<usize>)>
+    requests: Vec<(CanvasId, String, Extent2<usize>)>,
+    /// next window request ID
+    next: CanvasId,
 }
 
 impl App
@@ -35,7 +39,9 @@ impl App
             input: Input::new(),
             time: Time::new(),
             windows: HashMap::new(),
+            canvases: HashMap::new(),
             requests: Vec::new(),
+            next: CanvasId::zero(),
         }
     }
 
@@ -114,10 +120,11 @@ impl App
     /// to the `Sketch`
     pub(super) fn process_requests(&mut self, target: &WindowTarget<()>)
     {
-        while let Some((title, size)) = self.requests.pop()
+        while let Some((id, title, size)) = self.requests.pop()
         {
-            let window = Window::new(target, title, size);
+            let window = Window::new(target, title, size, id);
 
+            self.canvases.insert(id, window.winit.id());
             self.windows.insert(window.winit.id(), window);
         }
     }
@@ -147,16 +154,28 @@ impl App
     }
 
     /// create a new `Canvas`, and effectively a window, to
-    /// draw to
-    pub fn create_canvas(&mut self, title: impl Into<String>, size: impl Into<Extent2<usize>>)
+    /// draw to. returns that `Canvas`' `CanvasId` to reference
+    /// back to it later on. note that the window won't actually
+    /// be instantly created. instead, calls to `create_canvas`
+    /// are polled right after the enclosing function goes out of
+    /// scope. 
+    pub fn create_canvas(&mut self, title: impl Into<String>, size: impl Into<Extent2<usize>>) -> CanvasId
     {
-        self.requests.push((title.into(), size.into()));
+        let id = self.next;
+
+        self.next = self.next.next();
+        self.requests.push((id, title.into(), size.into()));
+
+        id
     }
 
     /// destroys a `Canvas` given its ID if it exists, or
     /// does nothing if it doesn't
     pub fn destroy_canvas(&mut self, id: CanvasId)
     {
-        self.windows.remove(&id.0);
+        if let Some(id) = self.canvases.remove(&id)
+        {
+            self.windows.remove(&id);
+        }
     }
 }
