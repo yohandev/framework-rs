@@ -38,9 +38,8 @@ impl Time
         }
     }
 
-    /// updates this instance of Time and returns itself
-    /// to pass to App's update
-    pub(crate) fn update(&mut self) -> &Self
+    /// updates this instance of Time and
+    pub(crate) fn update(&mut self)
     {
         self.tick += 1;
 
@@ -54,8 +53,6 @@ impl Time
             self.fps.1 = FPS_SAMPLE_SIZE as f32 / self.fps.0;
             self.fps.0 = 0.0;
         }
-
-        self
     }
 
     /// delta time between the beginnings of the last frame and

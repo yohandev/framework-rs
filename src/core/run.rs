@@ -1,14 +1,11 @@
 use std::collections::HashMap;
 
-use pixels::{ Pixels, SurfaceTexture };
-
-use winit_input_helper::WinitInputHelper;
-
 use winit::event_loop::{ ControlFlow, EventLoop };
 use winit::window::WindowId;
 use winit::event::Event;
 
-use crate::{draw::{ Canvas, Window }, input::Input};
+use crate::input::{ Input, ProcessedEvent };
+use crate::draw::{ Canvas, Window };
 use crate::core::{ Sketch, Time };
 
 /// run the sketch, hyjacking the main thread until the
@@ -28,44 +25,58 @@ pub fn run<T: Sketch>()
     // create state
     let mut state = T::setup(app);
 
-    events.run(move |evt, _, control_flow|
+    events.run(move |event, _, control_flow|
     {
-        // draw the current frame
-        if let Event::RedrawRequested(id) = evt
+        match input.process(event)
         {
-            // get the frame
-            let window = windows[&id];
-            
-            // update buffer
-            state.draw(&mut window.get_frame());
-
-            // render
-            if window.pixels.render().is_err()
+            // notify `Pixels` of the window resize
+            ProcessedEvent::WindowResized(id, (w, h)) =>
             {
-                return *control_flow = ControlFlow::Exit;
+                windows[&id].pixels.resize(w, h);
             }
-        }
-
-        // handle input events
-        if input.update(&evt)
-        {
-            // close events
-            if input.quit()
+            // close window and quit if needed
+            ProcessedEvent::WindowClose(id) =>
             {
-                return *control_flow = ControlFlow::Exit;
-            }
+                // stop keeping track of and drop window
+                windows.remove(&id);
 
-            // resize the window
-            if let Some(size) = input.window_resized()
+                // quit?
+                if windows.is_empty()
+                {
+                    return *control_flow = ControlFlow::Exit;
+                }
+            }
+            // render to the given window
+            ProcessedEvent::ShouldRender(id) =>
             {
-                pixels.resize(size.width, size.height);
-            }
+                // get the frame
+                let window = windows[&id];
+                
+                // update buffer
+                state.draw(&mut window.get_frame());
 
-            // update state
-            state.update(time.update());
-            
-            // request a redraw
-            window.request_redraw();
+                // render
+                if window.pixels.render().is_err()
+                {
+                    return *control_flow = ControlFlow::Exit;
+                }
+            }
+            // update the Sketch state and request new events
+            ProcessedEvent::ShouldUpdate =>
+            {
+                // update time
+                time.update();
+
+                // update state
+                state.update(/* &mut App */);
+                
+                // request a redraw on each window
+                for (_, window) in windows.iter_mut()
+                {
+                    window.winit.request_redraw();
+                }
+            }
+            ProcessedEvent::None => { }
         }
     });
 }
