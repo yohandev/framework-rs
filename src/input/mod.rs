@@ -1,20 +1,10 @@
-// TODO use own types for keycode and mouse button
-pub use winit::event::{ Event, VirtualKeyCode as KeyCode, MouseButton };
+mod mouse;
+mod keys;
 
-/// stores raw keyboard, mouse, and [TODO] controller input.
-/// It caches physical buttons that are held or up, as well as
-/// buttons pressed or released during the duration of this frame.
-pub struct Input
-{
-    cursor: [f64; 2],        // actual mouse position
-    delta: [f64; 2],         // delta mouse position
-    scroll: [f32; 2],        // scroll wheel
+pub use self::mouse::Mouse;
+pub use self::keys::Keys;
 
-    keys: [InputState; 255], // up, down, pressed, and released data
-    btns: [InputState; 255], // same as keys, but for mouse buttons
-}
-
-/// enumeration to cache the state of input keys and buttons, used by
+/// enumeration to cache the state of input keys and buttons
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 #[repr(u8)]
 enum InputState
@@ -29,21 +19,22 @@ enum InputState
     Released = 3,
 }
 
+// TODO use own types for keycode and mouse button
+pub use winit::event::{ Event, VirtualKeyCode as KeyCode, MouseButton };
+
+/// stores raw keyboard, mouse, and [TODO] controller input.
+/// It caches physical buttons that are held or up, as well as
+/// buttons pressed or released during the duration of this frame.
+pub struct Input
+{
+    /// mouse input
+    mouse: Mouse,
+    /// keyboard input
+    keys: Keys,
+}
+
 impl Input
 {
-    pub(crate) fn new() -> Self
-    {
-        Self
-        {
-            cursor: [0.0; 2],
-            scroll: [0.0; 2],
-            delta: [0.0; 2],
-
-            keys: [InputState::Up; 255],
-            btns: [InputState::Up; 255],
-        }
-    }
-
     /// is the key pressed this frame or held for the duration
     /// of this frame? useful for continuous input actions,
     /// such as character movement.
