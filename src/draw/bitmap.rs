@@ -6,6 +6,7 @@ use crate::math::*;
 
 /// represents a bitmap, which can be iterated and
 /// drawn to
+#[derive(Debug, Default)]
 pub struct Bitmap<T: Buf>
 {
     /// inner byte array representing this bitmap

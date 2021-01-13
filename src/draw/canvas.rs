@@ -9,6 +9,7 @@ use crate::draw::Bitmap;
 /// a window(distinguishable with `Canvas::id()`)
 ///
 /// [Bitmap]: crate::Bitmap
+#[derive(Debug)]
 pub struct Canvas<'a> 
 {
     /// pixel buffer frame

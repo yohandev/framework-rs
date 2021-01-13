@@ -9,6 +9,7 @@ use crate::math::Extent2;
 
 /// represents a window and a pixel buffer
 /// attatched to its swapchain
+#[derive(Debug)]
 pub(crate) struct Window
 {
     /// pixels buffer
