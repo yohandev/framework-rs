@@ -14,10 +14,10 @@ pub struct Bitmap<T: Buf>
     /// width and height, in pixels, of this bitmap
     size: Extent2<usize>,
 
-    /// current stroke colour
-    stroke: Rgba<u8>,
-    /// current fill colour
-    fill: Rgba<u8>
+    /// current stroke colour, if any
+    stroke: Option<Rgba<u8>>,
+    /// current fill colour, if any
+    fill: Option<Rgba<u8>>,
 }
 
 /// restrictions for a type that can be used as a bitmap
@@ -36,8 +36,8 @@ impl<T: Buf> Bitmap<T>
         debug_assert_eq!(inner.as_ref().len() / 4, size.w * size.h);
 
         // pen
-        let stroke = Rgba::white();
-        let fill = Rgba::grey(0x80);
+        let stroke = Some(Rgba::white());
+        let fill = Some(Rgba::grey(0x80));
 
         Self { inner, size, stroke, fill }
     }
@@ -214,28 +214,28 @@ impl<T: Buf> Bitmap<T>
 
     /// get the current fill colour
     #[inline]
-    pub fn fill(&self) -> Rgba<u8>
+    pub fn fill(&self) -> Option<Rgba<u8>>
     {
         self.fill
     }
 
     /// set the fill colour to be used for any future drawing calls
     #[inline]
-    pub fn set_fill(&mut self, col: Rgba<u8>)
+    pub fn set_fill(&mut self, col: Option<Rgba<u8>>)
     {
         self.fill = col;
     }
 
     /// get the current stroke colour
     #[inline]
-    pub fn stroke(&self) -> Rgba<u8>
+    pub fn stroke(&self) -> Option<Rgba<u8>>
     {
         self.stroke
     }
 
     /// set the stroke colour to be used for any future drawing calls
     #[inline]
-    pub fn set_stroke(&mut self, col: Rgba<u8>)
+    pub fn set_stroke(&mut self, col: Option<Rgba<u8>>)
     {
         self.stroke = col;
     }
@@ -320,9 +320,13 @@ impl<T: Buf> Bitmap<T>
     {
         use crate::util::Bresenham;
 
-        for pos in Bresenham::new_bounded(a, b, self.size().as_())
+        // stroke
+        if let Some(stroke) = self.stroke
         {
-            self[pos] = self.stroke;
+            for pos in Bresenham::new_bounded(a, b, self.size().as_())
+            {
+                self[pos] = stroke;
+            }
         }
     }
 
@@ -332,10 +336,19 @@ impl<T: Buf> Bitmap<T>
     {
         use crate::util::Triangle;
 
-        for (pos, _) in Triangle::new_bounded([a, b, c], self.size().as_())
+        // fill
+        if let Some(fill) = self.fill
         {
-            self[pos] = self.fill;
+            for (pos, _) in Triangle::new_bounded([a, b, c], self.size().as_())
+            {
+                self[pos] = fill;
+            }
         }
+
+        // stroke
+        self.line(a, b);
+        self.line(b, c);
+        self.line(c, a);
     }
 }
 
