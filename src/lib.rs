@@ -30,6 +30,7 @@ pub mod prelude
         ParallelIterator,
         Image,
         Canvas,
+        CanvasId
     };
     pub use crate::
     {
