@@ -39,75 +39,15 @@ impl Input
     {
         if let Event::NewEvents(_) = evt
         {
-            // reset keyboard keys
-            for key in self.keys.iter_mut()
-            {
-                *key = match *key
-                {
-                    InputState::Pressed => InputState::Down,
-                    InputState::Released => InputState::Up,
-                    InputState::Down => InputState::Down,
-                    InputState::Up => InputState::Up,
-                };
-            }
-
-            // reset mouse buttons
-            for btn in self.btns.iter_mut()
-            {
-                *btn = match *btn
-                {
-                    InputState::Pressed => InputState::Down,
-                    InputState::Released => InputState::Up,
-                    InputState::Down => InputState::Down,
-                    InputState::Up => InputState::Up,
-                };
-            }
-
-            // reset mouse scroll
-            self.scroll[0] = 0.0;
-            self.scroll[1] = 0.0;
-
-            // reset mouse delta
-            self.delta[0] = 0.0;
-            self.delta[1] = 0.0;
+            self.mouse.reset();
+            self.keys.reset();
         }
-        if let Event::WindowEvent { event, ..} = evt
+        if let Event::WindowEvent { event: window_event, ..} = evt
         {
-            match event
+            self.mouse.update(&window_event);
+            self.keys.update(&window_event);
+            match window_event
             {
-                winit::event::WindowEvent::KeyboardInput { input, .. } =>
-                {
-                    if let Some(code) = input.virtual_keycode
-                    {
-                        let code = code as usize;
-
-                        match input.state
-                        {
-                            winit::event::ElementState::Pressed =>
-                            {
-                                self.keys[code] = if self.keys[code] == InputState::Up
-                                {
-                                    InputState::Pressed
-                                }
-                                else
-                                {
-                                    InputState::Down
-                                };
-                            }
-                            winit::event::ElementState::Released =>
-                            {
-                                self.keys[code] = if self.keys[code] == InputState::Down
-                                {
-                                    InputState::Released
-                                }
-                                else
-                                {
-                                    InputState::Up
-                                };
-                            }
-                        }
-                    }
-                }
                 winit::event::WindowEvent::CursorMoved { position, .. } =>
                 {
                     self.delta[0] = position.x - self.cursor[0];

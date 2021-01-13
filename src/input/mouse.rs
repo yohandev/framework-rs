@@ -26,6 +26,34 @@ pub type MouseButton = winit::event::MouseButton;
 
 impl Mouse
 {
+    /// reset the input states within `self` to prepare for
+    /// a new frame
+    pub(super) fn reset(&mut self)
+    {
+        // buttons
+        for btn in self.btn.iter_mut()
+        {
+            *btn = match *btn
+            {
+                InputState::Pressed => InputState::Down,
+                InputState::Released => InputState::Up,
+                InputState::Down => InputState::Down,
+                InputState::Up => InputState::Up,
+            };
+        }
+        //delta
+        self.del = Vec2::zero();
+        // scroll
+        self.scroll = Vec2::zero();
+    }
+
+    /// update the internal input states within `self` using
+    /// the relevant winit-provided event
+    pub(super) fn update(&mut self, event: &winit::event::WindowEvent)
+    {
+
+    }
+
     /// is the button pressed this frame or held for the duration
     /// of this frame? useful for continuous input actions,
     /// such as automatic weapons in a game.
