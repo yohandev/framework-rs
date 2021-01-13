@@ -313,6 +313,18 @@ impl<T: Buf> Bitmap<T>
             dst_buf[dst_str..dst_end].copy_from_slice(&src_buf[src_str..src_end]);
         }
     }
+
+    /// draws a line from `a` to `b`, clipping any pixels out of
+    /// bounds
+    pub fn line(&mut self, a: Vec2<i32>, b: Vec2<i32>)
+    {
+        use crate::util::Bresenham;
+
+        for pos in Bresenham::new_bounded(a, b, self.size().as_())
+        {
+            self[pos] = self.stroke;
+        }
+    }
 }
 
 /// blanket implementation
