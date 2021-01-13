@@ -4,6 +4,20 @@ mod keys;
 pub use self::mouse::Mouse;
 pub use self::keys::Keys;
 
+use winit::window::WindowId;
+use winit::event::Event;
+
+/// stores raw keyboard, mouse, and [TODO] controller input.
+/// It caches physical buttons that are held or up, as well as
+/// buttons pressed or released during the duration of this frame.
+pub struct Input
+{
+    /// mouse input
+    mouse: Mouse,
+    /// keyboard input
+    keys: Keys,
+}
+
 /// enumeration to cache the state of input keys and buttons
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 #[repr(u8)]
@@ -19,33 +33,74 @@ enum InputState
     Released = 3,
 }
 
-// TODO use own types for keycode and mouse button
-pub use winit::event::{ Event };
-
-/// stores raw keyboard, mouse, and [TODO] controller input.
-/// It caches physical buttons that are held or up, as well as
-/// buttons pressed or released during the duration of this frame.
-pub struct Input
+/// yield of `Input::process()` relevant to the `framework::run`
+/// function
+pub(crate) enum ProcessedEvent
 {
-    /// mouse input
-    mouse: Mouse,
-    /// keyboard input
-    keys: Keys,
+    /// the given window was resized to the size
+    WindowResized(WindowId, (u32, u32)),
+    /// the given window was requested to close
+    WindowClose(WindowId),
+    /// the given window should render and refresh
+    ShouldRender(WindowId),
+    /// the framework should call `Sketch::update()`
+    ShouldUpdate,
+    /// nothing to be reported
+    None,
 }
 
 impl Input
 {
-    pub(crate) fn update(&mut self, evt: Event<()>)
+    /// process a raw incoming winit event
+    pub(crate) fn process(&mut self, event: Event<()>) -> ProcessedEvent
     {
-        if let Event::NewEvents(_) = evt
+        use winit::event::WindowEvent;
+
+        match event
         {
-            self.mouse.reset();
-            self.keys.reset();
-        }
-        if let Event::WindowEvent { event: window_event, ..} = evt
-        {
-            self.mouse.update(&window_event);
-            self.keys.update(&window_event);
+            Event::NewEvents(_) =>
+            {
+                // reset mouse and keyboard
+                self.mouse.reset();
+                self.keys.reset();
+
+                ProcessedEvent::None
+            }
+            Event::WindowEvent { window_id, event } =>
+            {
+                // process mouse and keyboard
+                self.mouse.process(&event);
+                self.keys.process(&event);
+
+                // process additional
+                match event
+                {
+                    WindowEvent::Resized(siz) =>
+                    {
+                        ProcessedEvent::WindowResized(window_id, (siz.width, siz.height))
+                    }
+                    WindowEvent::CloseRequested =>
+                    {
+                        ProcessedEvent::WindowClose(window_id)
+                    }
+                    WindowEvent::DroppedFile(_) =>
+                    {
+                        // TODO: store dropped file
+
+                        ProcessedEvent::None
+                    }
+                    WindowEvent::Focused(_) =>
+                    {
+                        // TODO: keep track of focus
+
+                        ProcessedEvent::None
+                    },
+                    _ => ProcessedEvent::None
+                }
+            }
+            Event::MainEventsCleared => ProcessedEvent::ShouldUpdate,
+            Event::RedrawRequested(window_id) => ProcessedEvent::ShouldRender(window_id),
+            _ => ProcessedEvent::None
         }
     }
 }

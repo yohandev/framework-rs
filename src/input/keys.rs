@@ -35,7 +35,7 @@ impl Keys
 
     /// update the internal input states within `self` using
     /// the relevant winit-provided event
-    pub(super) fn update(&mut self, event: &WindowEvent)
+    pub(super) fn process(&mut self, event: &WindowEvent)
     {
         use winit::event::{ KeyboardInput, ElementState };
 
