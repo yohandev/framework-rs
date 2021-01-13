@@ -1,6 +1,7 @@
+use crate::draw::CanvasId;
+use crate::math::Extent2;
 use crate::input::Input;
-
-use super::Time;
+use crate::core::Time;
 
 /// handle to the application running this `Sketch`.
 /// this is how `Canvas`es are created or input and
@@ -15,4 +16,16 @@ pub struct App<'a>
 {
     pub(super) input: &'a Input,
     pub(super) time: &'a Time,
+
+    pub(super) requests: Vec<AppRequest>
+}
+
+/// queued instructions for an `App` that are then
+/// polled by `framework::run`
+pub(super) enum AppRequest
+{
+    /// create a new window/canvas
+    CreateCanvas(String, Extent2<usize>),
+    // close a canvas
+    CloseCanvas(CanvasId),
 }

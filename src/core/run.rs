@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
-use winit::event_loop::{ ControlFlow, EventLoop };
+use winit::event_loop::{ ControlFlow, EventLoop, EventLoopWindowTarget as WindowTarget };
 use winit::window::WindowId;
 
 use crate::input::{ Input, ProcessedEvent };
-use crate::core::{ Sketch, Time };
+use crate::core::{ Sketch, Time, App };
 use crate::draw::Window;
+
+use super::app::AppRequest;
 
 /// run the sketch, hyjacking the main thread until the
 /// window is closed
@@ -21,8 +23,47 @@ pub fn run<T: Sketch>()
     let mut input = Input::new();
     let mut time = Time::new();
     
-    // create state
-    let mut state = T::setup(/* &mut App */);
+    // callbacks to avoid code duplication
+    let app = ||
+    {
+        App
+        {
+            input: &input,
+            time: &time,
+            requests: Vec::with_capacity(0),
+        }
+    };
+    let process_requests = |target: &WindowTarget<()>, requests: Vec<AppRequest>|
+    {
+        for request in requests
+        {
+            match request
+            {
+                AppRequest::CreateCanvas(title, size) =>
+                {
+                    let window = Window::new(target, title, size);
+
+                    windows.insert(window.winit.id(), window);
+                }
+                AppRequest::CloseCanvas(id) =>
+                {
+                    windows.remove(&id.0);
+                }
+            }
+        }
+    };
+    
+    // create the `Sketch`
+    let mut sketch =
+    {
+        // setup with an `App`
+        let app = app();
+        let sketch = T::setup(&mut app);
+
+        process_requests(&events, app.requests);
+
+        sketch
+    };
 
     events.run(move |event, _, control_flow|
     {
@@ -52,7 +93,7 @@ pub fn run<T: Sketch>()
                 let window = windows[&id];
                 
                 // update buffer
-                state.draw(&mut window.get_frame());
+                sketch.draw(&mut window.get_frame());
 
                 // render
                 if window.pixels.render().is_err()
@@ -67,7 +108,7 @@ pub fn run<T: Sketch>()
                 time.update();
 
                 // update state
-                state.update(/* &mut App */);
+                sketch.update(&mut app());
                 
                 // request a redraw on each window
                 for (_, window) in windows.iter_mut()

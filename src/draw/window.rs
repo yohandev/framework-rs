@@ -22,7 +22,7 @@ pub(crate) struct Window
 impl Window
 {
     /// create a new window
-    pub(crate) fn new(events: &EventLoopWindowTarget<()>, title: impl Into<String>, size: Extent2<usize>) -> Self
+    pub(crate) fn new(target: &EventLoopWindowTarget<()>, title: impl Into<String>, size: Extent2<usize>) -> Self
     {
         let logical_size = LogicalSize::new(size.w as f64, size.h as f64);
 
@@ -30,7 +30,7 @@ impl Window
             .with_min_inner_size(logical_size)
             .with_inner_size(logical_size)
             .with_title(title)
-            .build(events)
+            .build(target)
             .unwrap();
 
         let mut pixels =

@@ -23,7 +23,7 @@ pub struct Canvas<'a>
 /// 
 /// [Canvas]: crate::draw::Canvas
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct CanvasId(WindowId);
+pub struct CanvasId(pub(crate) WindowId);
 
 impl<'a> Deref for Canvas<'a>
 {
