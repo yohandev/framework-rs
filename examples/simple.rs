@@ -18,12 +18,20 @@ impl Sketch for Foo
 
     fn draw(&mut self, c: &mut Canvas)
     {
+        // clear background to blue
         background!(c, Rgba::blue());
 
-        stroke!(c, Rgba::red());
+        // draw a red line
+        stroke!(c, (0xff, 0x00, 0x00));
         lines!(c, [20, 10], [200, 100]);
 
-        stroke!(c, Rgba::yellow());
+        // draw some green lines
+        stroke!(c, (0x00, 0x00, 0xff));
         lines!(c, ([50, 100], [0, 10]), ([60, 32], [90, 67]));
+
+        // draw purple triangle with no stroke
+        stroke!(c, None);
+        fill!(c, (0xff, 0x00, 0xff));
+        
     }
 }
