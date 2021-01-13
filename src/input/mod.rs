@@ -46,66 +46,6 @@ impl Input
         {
             self.mouse.update(&window_event);
             self.keys.update(&window_event);
-            match window_event
-            {
-                winit::event::WindowEvent::CursorMoved { position, .. } =>
-                {
-                    self.delta[0] = position.x - self.cursor[0];
-                    self.delta[1] = position.y - self.cursor[1];
-
-                    self.cursor[0] = position.x;
-                    self.cursor[1] = position.y;
-                }
-                winit::event::WindowEvent::MouseWheel { delta, .. } =>
-                {
-                    const PIXELS_PER_LINE: f32 = 38.0;
-
-                    match delta
-                    {
-                        winit::event::MouseScrollDelta::LineDelta(x, y) =>
-                        {
-                            self.scroll[0] += x;
-                            self.scroll[1] += y;
-                        }
-                        winit::event::MouseScrollDelta::PixelDelta(dt) =>
-                        {
-                            self.scroll[0] += dt.x as f32 / PIXELS_PER_LINE;
-                            self.scroll[1] += dt.y as f32 / PIXELS_PER_LINE;
-                        }
-                    }
-                }
-                winit::event::WindowEvent::MouseInput { state, button, .. } =>
-                {
-                    let code = map_mouse_button(&button);
-
-                    match state
-                    {
-                        winit::event::ElementState::Pressed =>
-                        {
-                            self.btns[code] = if self.btns[code] == InputState::Up
-                            {
-                                InputState::Pressed
-                            }
-                            else
-                            {
-                                InputState::Down
-                            };
-                        }
-                        winit::event::ElementState::Released =>
-                        {
-                            self.btns[code] = if self.btns[code] == InputState::Down
-                            {
-                                InputState::Released
-                            }
-                            else
-                            {
-                                InputState::Up 
-                            };
-                        }
-                    }
-                },
-                _ => {}
-            }
         }
     }
 }

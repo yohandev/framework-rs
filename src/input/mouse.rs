@@ -1,3 +1,5 @@
+use winit::event::WindowEvent;
+
 use crate::input::InputState;
 use crate::math::Vec2;
 
@@ -49,9 +51,53 @@ impl Mouse
 
     /// update the internal input states within `self` using
     /// the relevant winit-provided event
-    pub(super) fn update(&mut self, event: &winit::event::WindowEvent)
-    {
+    pub(super) fn update(&mut self, event: &WindowEvent)
+    {        
+        match event
+        {
+            WindowEvent::CursorMoved { position, .. } =>
+            {
+                let pos = Vec2::new(position.x, position.y);
 
+                self.del = pos - self.pos;
+                self.pos = pos;
+            }
+            WindowEvent::MouseWheel { delta, phase, .. } =>
+            {
+                use winit::event::MouseScrollDelta;
+
+                // not sure why this works... taken directly from
+                // winit input helper
+                const LINE_PER_PIXELS: f32 = 1.0 / 38.0;
+
+                match delta
+                {
+                    MouseScrollDelta::LineDelta(x, y) =>
+                    {
+                        self.scroll += Vec2::new(*x, *y);
+                    }
+                    MouseScrollDelta::PixelDelta(dt) =>
+                    {
+                        self.scroll += Vec2::new(dt.x as f32, dt.y as f32) * LINE_PER_PIXELS;
+                    }
+                }
+            }
+            WindowEvent::MouseInput { state, button, .. } =>
+            {
+                use winit::event::ElementState;
+
+                let code = map_mouse_button(*button);
+
+                self.btn[code] = match (state, self.btn[code])
+                {
+                    (ElementState::Pressed, InputState::Up) => InputState::Pressed,
+                    (ElementState::Released, InputState::Down) => InputState::Released,
+                    (ElementState::Pressed, _) => InputState::Down,
+                    (ElementState::Released, _) => InputState::Up,
+                };
+            },
+            _ => { }
+        }
     }
 
     /// is the button pressed this frame or held for the duration
