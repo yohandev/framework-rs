@@ -277,7 +277,7 @@ impl<T: Buf> Bitmap<T>
     /// pixels and (optionally) translating it
     ///
     /// the source bitmap isn't affected
-    pub fn paste(&mut self, pos: Vec2<i32>, src: &Bitmap<impl Buf>)
+    pub fn image(&mut self, src: &Bitmap<impl Buf>, pos: Vec2<i32>)
     {
         // givens
         let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
