@@ -1,4 +1,4 @@
-pub mod macros;
+// pub mod macros;
 
 mod canvas;
 mod bitmap;

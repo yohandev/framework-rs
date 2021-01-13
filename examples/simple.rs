@@ -19,23 +19,24 @@ impl Sketch for Foo
     fn draw(&mut self, c: &mut Canvas)
     {
         // clear background to blue
-        background!(c, Rgba::blue());
+        c.background(Rgba::blue());
 
         // draw a red line
-        stroke!(c, [0xff, 0x00, 0x00]);
-        lines!(c, [20, 10], [200, 100]);
+        c.stroke([0xff, 0x00, 0x00]);
+        c.line([20, 10], [200, 100]);
 
         // draw some green lines
-        stroke!(c, [0x00, 0xff, 0x00]);
-        lines!(c, ([50, 100], [0, 10]), ([60, 32], [90, 67]));
+        c.stroke([0x00, 0xff, 0x00]);
+        c.line([50, 100], [0, 10]);
+        c.line([60, 32], [90, 67]);
 
         // draw purple triangle with no stroke
-        stroke!(c, None);
-        fill!(c, [0xff, 0x00, 0xff]);
-        triangle!(c, [120, 200], [20, 30], [350, 300]);
+        c.no_stroke();
+        c.fill([0xff, 0x00, 0xff]);
+        c.triangle([120, 200], [20, 30], [350, 300]);
 
         // same purple triangle, black stroke
-        stroke!(c, [0x00, 0x00, 0x00]);
-        triangle!(c, [370, 10], [370, 230], [250, 45]);
+        c.stroke([0x00, 0x00, 0x00]);
+        c.triangle([370, 10], [370, 230], [250, 45]);
     }
 }

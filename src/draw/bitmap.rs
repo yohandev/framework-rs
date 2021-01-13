@@ -15,9 +15,9 @@ pub struct Bitmap<T: Buf>
     size: Extent2<usize>,
 
     /// current stroke colour, if any
-    stroke: Option<Rgba<u8>>,
+    pub stroke: Option<Rgba<u8>>,
     /// current fill colour, if any
-    fill: Option<Rgba<u8>>,
+    pub fill: Option<Rgba<u8>>,
 }
 
 /// restrictions for a type that can be used as a bitmap
@@ -212,32 +212,36 @@ impl<T: Buf> Bitmap<T>
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
     }
 
-    /// get the current fill colour
+    /// set the fill colour to be used for any future drawing calls.
+    /// this is a shorthand for `canvas.fill = Some(col)`
     #[inline]
-    pub fn fill(&self) -> Option<Rgba<u8>>
+    pub fn fill(&mut self, col: Rgba<u8>)
     {
-        self.fill
-    }
-
-    /// set the fill colour to be used for any future drawing calls
-    #[inline]
-    pub fn set_fill(&mut self, col: Option<Rgba<u8>>)
-    {
-        self.fill = col;
-    }
-
-    /// get the current stroke colour
-    #[inline]
-    pub fn stroke(&self) -> Option<Rgba<u8>>
-    {
-        self.stroke
+        self.fill = Some(col);
     }
 
     /// set the stroke colour to be used for any future drawing calls
+    /// this is a shorthand for `canvas.stroke = Some(col)`
     #[inline]
-    pub fn set_stroke(&mut self, col: Option<Rgba<u8>>)
+    pub fn stroke(&mut self, col: Rgba<u8>)
     {
-        self.stroke = col;
+        self.stroke = Some(col);
+    }
+
+    /// any future drawing calls will have no fill colour.
+    /// this is a shorthand for `canvas.fill = None`
+    #[inline]
+    pub fn no_fill(&mut self)
+    {
+        self.fill = None;
+    }
+
+    /// any future drawing calls will have no stroke colour.
+    /// this is a shorthand for `canvas.stroke = None`
+    #[inline]
+    pub fn no_stroke(&mut self)
+    {
+        self.stroke = None;
     }
 
     /// fills this entire bitmap with a color. this is much more efficient
