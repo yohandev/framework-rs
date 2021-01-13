@@ -108,4 +108,16 @@ impl Time
     {
         self.tick % FPS_SAMPLE_SIZE == 0
     }
+
+    /// utility function that prints the current frames per second
+    /// if and only if the frames per second has been recalculated
+    /// this frame. it's useful to call this function onc every frame
+    /// to get a [non-spammy] FPS report of your `Sketch`
+    pub fn print_fps(&self)
+    {
+        if self.fps_was_updated()
+        {
+            println!("FPS: {:.2}", self.fps());
+        }
+    }
 }

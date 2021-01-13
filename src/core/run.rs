@@ -33,7 +33,7 @@ pub fn run<T: Sketch>()
             requests: Vec::with_capacity(0),
         }
     };
-    let process_requests = |target: &WindowTarget<()>, requests: Vec<AppRequest>|
+    let mut process_requests = |target: &WindowTarget<()>, requests: Vec<AppRequest>|
     {
         for request in requests
         {
@@ -57,7 +57,7 @@ pub fn run<T: Sketch>()
     let mut sketch =
     {
         // setup with an `App`
-        let app = app();
+        let mut app = app();
         let sketch = T::setup(&mut app);
 
         process_requests(&events, app.requests);
