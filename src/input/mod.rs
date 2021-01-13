@@ -20,7 +20,7 @@ enum InputState
 }
 
 // TODO use own types for keycode and mouse button
-pub use winit::event::{ Event, VirtualKeyCode as KeyCode, MouseButton };
+pub use winit::event::{ Event };
 
 /// stores raw keyboard, mouse, and [TODO] controller input.
 /// It caches physical buttons that are held or up, as well as
@@ -35,151 +35,6 @@ pub struct Input
 
 impl Input
 {
-    /// is the key pressed this frame or held for the duration
-    /// of this frame? useful for continuous input actions,
-    /// such as character movement.
-    pub fn key_down(&self, code: KeyCode) -> bool
-    {
-        match self.keys[code as usize]
-        {
-            InputState::Down => true,
-            InputState::Pressed => true,
-            _ => false
-        }
-    }
-
-    /// was the key up and then pressed exactly during this frame?
-    /// useful for impulsive actions, like jumping.
-    pub fn key_pressed(&self, code: KeyCode) -> bool
-    {
-        self.keys[code as usize] == InputState::Pressed
-    }
-
-    /// was the key down and then released exactly druing this
-    /// frame?
-    pub fn key_released(&self, code: KeyCode) -> bool
-    {
-        self.keys[code as usize] == InputState::Released
-    }
-
-    /// opposite of Input::key_down()
-    pub fn key_up(&self, code: KeyCode) -> bool
-    {
-        !self.key_down(code)
-    }
-
-    /// is the button pressed this frame or held for the duration
-    /// of this frame? useful for continuous input actions,
-    /// such as automatic weapons in a game.
-    pub fn button_down(&self, code: MouseButton) -> bool
-    {
-        match self.btns[map_mouse_button(&code)]
-        {
-            InputState::Down => true,
-            InputState::Pressed => true,
-            _ => false
-        }
-    }
-
-    /// was the button up and then pressed exactly during this frame?
-    /// useful for impulsive actions, like shooting.
-    pub fn button_pressed(&self, code: MouseButton) -> bool
-    {
-        self.btns[map_mouse_button(&code)] == InputState::Pressed
-    }
-
-    /// was the button down and then released exactly druing this
-    /// frame?
-    pub fn button_released(&self, code: MouseButton) -> bool
-    {
-        self.btns[map_mouse_button(&code)] == InputState::Released
-    }
-
-    /// opposite of Input::button_down()
-    pub fn button_up(&self, code: MouseButton) -> bool
-    {
-        !self.button_down(code)
-    }
-
-    /// current mouse position, in window pixel coordinates
-    pub fn cursor(&self) -> &[f64; 2]
-    {
-        &self.cursor
-    }
-
-    /// x position of the current mouse position, in window pixel
-    /// coordinates.
-    pub fn cursor_x(&self) -> f64
-    {
-        self.cursor[0]
-    }
-
-    /// y position of the current mouse position, in window pixel
-    /// coordinates.
-    pub fn cursor_y(&self) -> f64
-    {
-        self.cursor[1]
-    }
-
-    /// delta mouse position, in window pixel coordinates
-    pub fn delta(&self) -> &[f64; 2]
-    {
-        &self.delta
-    }
-
-    /// x dimension of the delta mouse, in window pixel
-    /// coordinates
-    pub fn dx(&self) -> f64
-    {
-        self.delta[0]
-    }
-
-    /// y dimension of the delta mouse, in window pixel
-    /// coordinates
-    pub fn dy(&self) -> f64
-    {
-        self.delta[1]
-    }
-
-    /// delta scroll during this frame. if you need the total scroll
-    /// "position, " for some reason, you'll have to accumulate this
-    /// value each frame.
-    pub fn scroll(&self) -> &[f32; 2]
-    {
-        &self.scroll
-    }
-
-    /// delta scroll in the horizontal(x-axis) during this frame.
-    pub fn scroll_x(&self) -> f32
-    {
-        self.scroll[0]
-    }
-
-    /// delta scroll in the vertical(y-axis) during this frame.
-    pub fn scroll_y(&self) -> f32
-    {
-        self.scroll[1]
-    }
-
-    /// simulates an axis given two keys, returning 0 if both
-    /// or neither are pressed.
-    pub fn axis(&self, neg: KeyCode, pos: KeyCode) -> f32
-    {
-        let mut val = 0.0;
-
-        if self.key_down(neg) { val -= 1.0; }
-        if self.key_down(pos) { val += 1.0; }
-
-        val
-    }
-
-    /// get the state of the key for this frame. it's preferred
-    /// to use Input::key_up(), Input::key_down(), etc.
-    pub fn key_state(&self, code: KeyCode) -> InputState
-    {
-        self.keys[code as usize]
-    }
-
     pub(crate) fn update(&mut self, evt: Event<()>)
     {
         if let Event::NewEvents(_) = evt
@@ -312,17 +167,5 @@ impl Input
                 _ => {}
             }
         }
-    }
-}
-
-/// utility function to map mouse buttons to a number
-fn map_mouse_button(code: &MouseButton) -> usize
-{
-    match code
-    {
-        MouseButton::Left => 0,
-        MouseButton::Right => 1,
-        MouseButton::Middle => 2,
-        MouseButton::Other(byte) => *byte as usize,
     }
 }

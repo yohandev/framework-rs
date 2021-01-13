@@ -20,3 +20,100 @@ pub struct Mouse
     /// scroll wheel
     scroll: Vec2<f32>,
 }
+
+/// temporary mouse button
+pub type MouseButton = winit::event::MouseButton;
+
+impl Mouse
+{
+    /// is the button pressed this frame or held for the duration
+    /// of this frame? useful for continuous input actions,
+    /// such as automatic weapons in a game.
+    #[inline]
+    pub fn down(&self, btn: MouseButton) -> bool
+    {
+        match self.btn[map_mouse_button(btn)]
+        {
+            InputState::Down | InputState::Pressed => true,
+            _ => false
+        }
+    }
+
+    /// was the button up and then pressed exactly during this frame?
+    /// useful for impulsive actions, like shooting.
+    #[inline]
+    pub fn pressed(&self, btn: MouseButton) -> bool
+    {
+        self.btn[map_mouse_button(btn)] == InputState::Pressed
+    }
+
+    /// was the button down and then released exactly during this
+    /// frame?
+    #[inline]
+    pub fn released(&self, btn: MouseButton) -> bool
+    {
+        self.btn[map_mouse_button(btn)] == InputState::Released
+    }
+
+    /// current mouse position, in window pixel coordinates
+    #[inline]
+    pub fn position(&self) -> Vec2<f64>
+    {
+        self.pos
+    }
+
+    /// shortcut for `Mouse::position().x`
+    #[inline]
+    pub fn x(&self) -> f64
+    {
+        self.pos.x
+    }
+
+    /// shortcut for `Mouse::position().y`
+    #[inline]
+    pub fn y(&self) -> f64
+    {
+        self.pos.y
+    }
+
+    /// delta mouse position, in window pixel coordinates
+    #[inline]
+    pub fn delta(&self) -> Vec2<f64>
+    {
+        self.del
+    }
+
+    /// shortcut for `Mouse::delta().x`
+    #[inline]
+    pub fn dx(&self) -> f64
+    {
+        self.del.x
+    }
+
+    /// shortcut for `Mouse::delta().x`
+    #[inline]
+    pub fn dy(&self) -> f64
+    {
+        self.del.y
+    }
+
+    /// [delta] scroll accumulated during this frame
+    /// note: this is NOT the total scroll amount or "scroll position"
+    #[inline]
+    pub fn scroll(&self) -> Vec2<f32>
+    {
+        self.scroll
+    }
+}
+
+/// utility function to map mouse buttons to a number
+fn map_mouse_button(code: MouseButton) -> usize
+{
+    match code
+    {
+        MouseButton::Left => 0,
+        MouseButton::Right => 1,
+        MouseButton::Middle => 2,
+        MouseButton::Other(num) => num as usize,
+    }
+}
