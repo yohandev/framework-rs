@@ -114,4 +114,18 @@ impl Input
             _ => ProcessedEvent::None
         }
     }
+
+    /// get `Keys` from `self`
+    #[inline]
+    pub fn keys(&self) -> &Keys
+    {
+        &self.keys
+    }
+
+    /// get `Mouse` from `self`
+    #[inline]
+    pub fn mouse(&self) -> &Mouse
+    {
+        &self.mouse
+    }
 }
