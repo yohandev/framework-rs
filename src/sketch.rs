@@ -13,7 +13,7 @@ pub trait Sketch: 'static
     /// every frame
     fn draw(&mut self, c: &mut Canvas)
     {
-        c.clear(Default::default());
+        c.background(Default::default());
     }
 
     /// update the state of this `Sketch` and its

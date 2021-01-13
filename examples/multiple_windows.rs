@@ -22,15 +22,15 @@ impl Sketch for Bar
     {
         if c.id() == self.0
         {
-            c.clear(Rgba::blue());
+            c.background(Rgba::blue());
         }
         else if c.id() == self.1
         {
-            c.clear(Rgba::yellow());
+            c.background(Rgba::yellow());
         }
         else if c.id() == self.2
         {
-            c.clear(Rgba::green());
+            c.background(Rgba::green());
         }
     }
 }

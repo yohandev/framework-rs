@@ -202,21 +202,10 @@ impl<T: Buf> Bitmap<T>
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
     }
 
-    /// draw a single pixel to this bitmap. panics if out of bounds
-    #[inline]
-    pub fn set(&mut self, pos: Vec2<i32>, col: Rgba<u8>)
-    {
-        // index
-        let ind = pos.y as usize * self.width() + pos.x as usize;
-
-        // set
-        self.pixels_mut()[ind] = col;
-    }
-
     /// fills this entire bitmap with a color. this is much more efficient
     /// than iterating through the pixels and individually setting their
     /// colors.
-    pub fn clear(&mut self, col: Rgba<u8>)
+    pub fn background(&mut self, col: Rgba<u8>)
     {
         // get the buffer
         let buf = self.pixels_mut();
