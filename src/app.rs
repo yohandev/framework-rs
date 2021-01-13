@@ -4,10 +4,10 @@ use winit::event_loop::{ ControlFlow, EventLoopWindowTarget as WindowTarget };
 use winit::window::WindowId;
 use winit::event::Event;
 
-use crate::input::{ Input, Mouse, Keys, ProcessedEvent };
+use crate::input::{ Input, Mouse, Keys, Time, ProcessedEvent };
 use crate::draw::{ CanvasId, Window };
-use crate::core::{ Time, Sketch };
 use crate::math::Extent2;
+use crate::Sketch;
 
 /// handle to the application running this `Sketch`.
 /// this is how `Canvas`es are created or input and

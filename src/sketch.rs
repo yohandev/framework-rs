@@ -1,5 +1,5 @@
 use crate::draw::Canvas;
-use crate::core::App;
+use crate::App;
 
 /// represents a sketch that can be run by the framework
 pub trait Sketch: 'static

@@ -3,7 +3,12 @@ pub mod sound;
 pub mod draw;
 pub mod util;
 pub mod math;
-pub mod core;
+
+mod sketch;
+mod app;
+
+pub use crate::sketch::Sketch;
+pub use crate::app::App;
 
 pub mod prelude
 {
@@ -20,17 +25,36 @@ pub mod prelude
     {
         Track,
     };
-    pub use crate::core::
-    {
-        run,
-
-        App,
-        Sketch,
-    };
     pub use crate::draw::
     {
         ParallelIterator,
         Image,
         Canvas,
     };
+    pub use crate::
+    {
+        run,
+        Sketch,
+        App
+    };
+}
+
+// run the sketch, hyjacking the main thread until all the
+/// windows are closed
+pub fn run<T: sketch::Sketch>()
+{
+    // create event loop
+    let events = winit::event_loop::EventLoop::new();
+
+    // app & sketch
+    let mut app = app::App::new();
+    let mut sketch = T::setup(&mut app);
+    
+    // create initial windows
+    app.process_requests(&events);
+
+    events.run(move |event, window_target, control_flow|
+    {
+        app.process_event(&mut sketch, event, window_target, control_flow);
+    });
 }

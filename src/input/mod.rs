@@ -1,8 +1,11 @@
 mod mouse;
 mod keys;
+mod time;
 
 pub use self::mouse::Mouse;
 pub use self::keys::Keys;
+pub use self::time::Time;
+
 
 use winit::window::WindowId;
 use winit::event::Event;
