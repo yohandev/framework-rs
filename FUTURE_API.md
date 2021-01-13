@@ -23,22 +23,14 @@ impl Sketch for Foo
     // this method is implemented.
     fn draw(&mut self, c: &mut Canvas)
     {
-        // use macro...
-        background!(c, BLACK);
-        // ...or type it out manually:
         c.background(Rgba::BLACK);
 
-        // use macros...
-        stroke!(c, BLUE);
-        line!(c, [0, 0], [20, 40]);
-        // ...or type it out manually:
         c.stroke(Rgba::BLUE);
-        c.line(Vec2::new(0, 0), Vec2::new(20, 40));
+        c.line(v![0, 0], v![20, 40]);
 
-        // other macros...
-        fill!(c, [0x23, 0xff, 0x12, 0xff]);
-        triangle!(c, [20, 50], [1, 2], [50, 80]);
-        ellipse!(c, [70, 70], [10, 99]);
+        c.fill(c![0x23, 0xff, 0x12, 0xff]);
+        c.triangle(v![20, 50], v![1, 2], v![50, 80]);
+        c.ellipse(v![70, 70], v![10, 99]);
     }
 
     // update the sketch state [and app]. called
