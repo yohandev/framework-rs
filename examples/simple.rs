@@ -33,5 +33,9 @@ impl Sketch for Foo
         stroke!(c, None);
         fill!(c, (0xff, 0x00, 0xff));
         triangle!(c, [120, 200], [20, 30], [350, 300]);
+
+        // same purple triangle, black stroke
+        stroke!(c, (0x00, 0x00, 0x00));
+        triangle!(c, [370, 10], [370, 230], [250, 45]);
     }
 }
