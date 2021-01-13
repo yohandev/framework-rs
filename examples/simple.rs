@@ -18,12 +18,12 @@ impl Sketch for Foo
 
     fn draw(&mut self, c: &mut Canvas)
     {
-        let blue = Rgba::blue();
+        background!(c, Rgba::blue());
 
-        // all four of these work!
-        stroke!(c, blue);
-        fill!(c, Rgba::blue());
-        fill!(c, [0x00, 0x00, 0xff]);
-        fill!(c, Rgba::<f32>::blue().map(|n| (n * 255.0) as u8));
+        stroke!(c, Rgba::red());
+        lines!(c, [20, 10], [200, 100]);
+
+        stroke!(c, Rgba::yellow());
+        lines!(c, ([50, 100], [0, 10]), ([60, 32], [90, 67]));
     }
 }

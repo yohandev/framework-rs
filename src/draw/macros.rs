@@ -98,3 +98,25 @@ macro_rules! stroke
         $canvas.set_stroke($col)
     };
 }
+
+/// draw line(s) to the given canvas. this macro is called
+/// `lines` to disambiguate with `std::line`, and, as a result
+/// also supports drawing multiple lines at once.
+/// ```
+/// // draw one line from [x: 20, y: 10] to [x: 200, y: 100]
+/// lines!(c, [20, 10], [200, 100]);
+/// // draw two lines
+/// lines!(c, ([50, 100], [0, 10]), ([60, 32], [90, 67]));
+/// ```
+#[macro_export]
+macro_rules! lines
+{
+    ($canvas:expr, [$ax:expr, $ay:expr], [$bx:expr, $by:expr]) =>
+    {
+        $canvas.line(framework::math::Vec2::new($ax, $ay), framework::math::Vec2::new($bx, $by))
+    };
+    ($canvas:expr, $(([$ax:expr, $ay:expr], [$bx:expr, $by:expr])),*) =>
+    {
+        $($canvas.line(framework::math::Vec2::new($ax, $ay), framework::math::Vec2::new($bx, $by)));*
+    };
+}

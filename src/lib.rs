@@ -44,6 +44,7 @@ pub mod prelude
         background,
         stroke,
         fill,
+        lines,
     };
 }
 
