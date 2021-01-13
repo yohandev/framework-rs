@@ -21,7 +21,7 @@ impl Sketch for Foo
         let blue = Rgba::blue();
 
         // all four of these work!
-        fill!(c, blue);
+        stroke!(c, blue);
         fill!(c, Rgba::blue());
         fill!(c, [0x00, 0x00, 0xff]);
         fill!(c, Rgba::<f32>::blue().map(|n| (n * 255.0) as u8));

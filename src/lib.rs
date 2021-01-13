@@ -36,13 +36,14 @@ pub mod prelude
     {
         run,
         Sketch,
-        App
+        App,
     };
     // macros...
     pub use crate::
     {
         background,
-        fill
+        stroke,
+        fill,
     };
 }
 

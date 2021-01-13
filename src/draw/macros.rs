@@ -65,3 +65,36 @@ macro_rules! fill
         $canvas.set_fill($col)
     };
 }
+
+/// sets the colour to be used for any future drawing operations
+/// ```
+/// // all four of these work!
+/// stroke!(c, blue);
+/// stroke!(c, Rgba::blue());
+/// stroke!(c, [0x00, 0x00, 0xff]);
+/// stroke!(c, Rgba::<f32>::blue().map(|n| (n * 255.0) as u8));
+/// ```
+#[macro_export]
+macro_rules! stroke
+{
+    ($canvas:expr, ($x:expr, $y:expr, $z:expr, $w:expr)) =>
+    {
+        $canvas.set_stroke(framework::math::Rgba::new($x, $y, $z, $w))
+    };
+    ($canvas:expr, [$x:expr, $y:expr, $z:expr, $w:expr]) =>
+    {
+        $canvas.set_stroke(framework::math::Rgba::new($x, $y, $z, $w))
+    };
+    ($canvas:expr, ($x:expr, $y:expr, $z:expr)) =>
+    {
+        $canvas.set_stroke(framework::math::Rgba::new($x, $y, $z, 0xff))
+    };
+    ($canvas:expr, [$x:expr, $y:expr, $z:expr]) =>
+    {
+        $canvas.set_stroke(framework::math::Rgba::new($x, $y, $z, 0xff))
+    };
+    ($canvas:expr, $col:expr) =>
+    {
+        $canvas.set_stroke($col)
+    };
+}
