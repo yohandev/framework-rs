@@ -30,7 +30,7 @@ pub mod prelude
     pub use crate::draw::
     {
         ParallelIterator,
-        Bitmap,
+        Image,
         Canvas,
     };
 }
