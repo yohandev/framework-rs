@@ -10,9 +10,14 @@ use crate::math::*;
 pub struct Bitmap<T: Buf>
 {
     /// inner byte array representing this bitmap
-    pub(crate) inner: T,
+    inner: T,
     /// width and height, in pixels, of this bitmap
-    pub(crate) size: Extent2<usize>,
+    size: Extent2<usize>,
+
+    /// current stroke colour
+    stroke: Rgba<u8>,
+    /// current fill colour
+    fill: Rgba<u8>
 }
 
 /// restrictions for a type that can be used as a bitmap
@@ -30,7 +35,11 @@ impl<T: Buf> Bitmap<T>
         debug_assert_eq!(inner.as_ref().len() % 4, 0);
         debug_assert_eq!(inner.as_ref().len() / 4, size.w * size.h);
 
-        Self { inner, size }
+        // pen
+        let stroke = Rgba::white();
+        let fill = Rgba::grey(0x80);
+
+        Self { inner, size, stroke, fill }
     }
 
     /// get this bitmap's width and height, in pixels

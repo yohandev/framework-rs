@@ -1,12 +1,12 @@
-// clears the entire [Canvas] with the given
+/// clears the entire [Canvas] with the given
 /// colour.
-///
 /// ```
-/// background!(c, [0x30, 0x40, 0x1, 0xff]);
-/// background!(c, BLUE);
+/// // all four of these work!
+/// background!(c, blue);
+/// background!(c, Rgba::blue());
+/// background!(c, [0x00, 0x00, 0xff]);
 /// background!(c, Rgba::<f32>::blue().map(|n| (n * 255.0) as u8));
 /// ```
-///
 /// [Canvas]: framework::prelude::Canvas
 #[macro_export]
 macro_rules! background
