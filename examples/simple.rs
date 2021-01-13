@@ -22,20 +22,20 @@ impl Sketch for Foo
         background!(c, Rgba::blue());
 
         // draw a red line
-        stroke!(c, (0xff, 0x00, 0x00));
+        stroke!(c, [0xff, 0x00, 0x00]);
         lines!(c, [20, 10], [200, 100]);
 
         // draw some green lines
-        stroke!(c, (0x00, 0xff, 0x00));
+        stroke!(c, [0x00, 0xff, 0x00]);
         lines!(c, ([50, 100], [0, 10]), ([60, 32], [90, 67]));
 
         // draw purple triangle with no stroke
         stroke!(c, None);
-        fill!(c, (0xff, 0x00, 0xff));
+        fill!(c, [0xff, 0x00, 0xff]);
         triangle!(c, [120, 200], [20, 30], [350, 300]);
 
         // same purple triangle, black stroke
-        stroke!(c, (0x00, 0x00, 0x00));
+        stroke!(c, [0x00, 0x00, 0x00]);
         triangle!(c, [370, 10], [370, 230], [250, 45]);
     }
 }
