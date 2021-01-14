@@ -141,25 +141,33 @@ impl Mouse
         self.btn[map_mouse_button(btn)] == InputState::Released
     }
 
-    /// current mouse position, in window pixel coordinates
+    /// current mouse position, in window pixel coordinates.
+    /// note: this may be out of the canvas' bounds
     #[inline]
-    pub fn position(&self) -> Vec2<f64>
+    pub fn position(&self) -> Vec2<i32>
+    {
+        (self.pos * 0.5).as_()
+    }
+
+    /// get the raw mouse position relative to the window,
+    /// directly from winit
+    pub fn raw_position(&self) -> Vec2<f64>
     {
         self.pos
     }
 
     /// shortcut for `Mouse::position().x`
     #[inline]
-    pub fn x(&self) -> f64
+    pub fn x(&self) -> i32
     {
-        self.pos.x
+        (self.pos.x * 0.5) as i32
     }
 
     /// shortcut for `Mouse::position().y`
     #[inline]
-    pub fn y(&self) -> f64
+    pub fn y(&self) -> i32
     {
-        self.pos.y
+        (self.pos.y * 0.5) as i32
     }
 
     /// delta mouse position, in window pixel coordinates
