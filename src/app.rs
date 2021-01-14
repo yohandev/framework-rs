@@ -106,13 +106,18 @@ impl App
             ProcessedEvent::ShouldUpdate =>
             {
                 // update time
-                self.time.update();
+                if self.time.update()
+                {
+                    // update state if time says it's time to
+                    // update
+                    sketch.update(self);
 
-                // update state
-                sketch.update(self);
+                    // process requests
+                    self.process_requests(window_target);
 
-                // process requests
-                self.process_requests(window_target);
+                    // input has been used by update
+                    self.input.reset = true;
+                }
                 
                 // request a redraw on each window
                 for window in self.windows.iter_mut()
@@ -138,9 +143,9 @@ impl App
     /// get the current `Time` information for this
     /// frame
     #[inline]
-    pub fn time(&self) -> &Time
+    pub fn time(&mut self) -> &mut Time
     {
-        &self.time
+        &mut self.time
     }
 
     /// get the current state of the keyboard for this

@@ -21,6 +21,6 @@ pub trait Sketch: 'static
     /// frame
     fn update(&mut self, app: &mut App)
     {
-        app.time().print_fps();
+        app.time().print_current_frame_rate();
     }
 }

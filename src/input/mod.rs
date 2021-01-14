@@ -21,6 +21,12 @@ pub struct Input
     mouse: Mouse,
     /// keyboard input
     keys: Keys,
+
+    /// with artifical frame rate limiting, some events can be
+    /// missed. this flag, when set to true, will clear any input
+    /// indicating that a frame has passed and inputs haven't
+    /// been missed
+    pub(super) reset: bool,
 }
 
 /// enumeration to cache the state of input keys and buttons
@@ -63,6 +69,8 @@ impl Input
         {
             mouse: Mouse::new(),
             keys: Keys::new(),
+
+            reset: false,
         }
     }
 
@@ -76,8 +84,13 @@ impl Input
             Event::NewEvents(_) =>
             {
                 // reset mouse and keyboard
-                self.mouse.reset();
-                self.keys.reset();
+                if self.reset
+                {
+                    self.mouse.reset();
+                    self.keys.reset();
+                    
+                    self.reset = false;
+                }
 
                 ProcessedEvent::None
             }

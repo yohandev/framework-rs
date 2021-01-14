@@ -28,6 +28,7 @@ impl Sketch for SnakeGame
     fn setup(app: &mut App) -> Self
     {
         app.create_canvas("snake", (GRID_SIZE * TILE_SIZE).as_());
+        app.time().frame_rate(10.0);
 
         Self
         {
@@ -54,10 +55,13 @@ impl Sketch for SnakeGame
 
     fn update(&mut self, app: &mut App)
     {
+        // time
+        app.time().print_current_frame_rate();
+
         // input
         if app.keys().pressed(KeyCode::Left)  { self.dir = v![-1, 0]; }
         if app.keys().pressed(KeyCode::Right) { self.dir = v![ 1, 0]; }
-        if app.keys().pressed(KeyCode::Up)    { self.dir = v![0, -1]; }
+        if app.keys().pressed(KeyCode::Up)    { self.dir = v![ 0,-1]; }
         if app.keys().pressed(KeyCode::Down)  { self.dir = v![ 0, 1]; }
 
         // no movement

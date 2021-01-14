@@ -7,6 +7,8 @@ const FPS_SAMPLE_SIZE: u64 = 200;
 #[derive(Debug, Clone)]
 pub struct Time
 {
+    /// frame rate artificial limit, if any
+    pub limit: Option<Duration>,
     /// delta time between the beginnings of the last frame and
     /// of this frame
     delta: Duration,
@@ -29,6 +31,8 @@ impl Time
     {
         Self
         {
+            limit: None,
+
             delta: Duration::default(),
             total: Duration::default(),
             start: Instant::now(),
@@ -38,21 +42,37 @@ impl Time
         }
     }
 
-    /// updates this instance of Time and
-    pub(crate) fn update(&mut self)
+    /// updates this instance of Time and returns whether
+    /// update should be called
+    pub(crate) fn update(&mut self) -> bool
     {
-        self.tick += 1;
-
+        // time since last frame
         self.delta = self.start.elapsed();
+
+        // has artificial frame rate limit?
+        if let Some(limit) = self.limit
+        {
+            // update not ready to be called
+            if self.delta < limit
+            {
+                return false;
+            }
+        }
+
+        // update
+        self.tick += 1;
         self.total += self.delta;
         self.start = Instant::now();
 
+        // fps monitoring
         self.fps.0 += self.dt();
         if self.fps_was_updated()
         {
             self.fps.1 = FPS_SAMPLE_SIZE as f32 / self.fps.0;
             self.fps.0 = 0.0;
         }
+
+        return true;
     }
 
     /// delta time between the beginnings of the last frame and
@@ -93,31 +113,45 @@ impl Time
         self.tick
     }
 
+    /// sets the target frame rate. note that this rate may not
+    /// be reached(if the hardware isn't powerful enough) and is
+    /// likely to be innacurate. Use `Time::delta()` for time
+    /// sensitive cases
+    ///
+    /// this is a shorthand for:
+    /// ```
+    /// app.time().limit = Some(Duration::from_secs_f32(1.0 / rate));
+    /// ```
+    pub fn frame_rate(&mut self, rate: f32)
+    {
+        self.limit = Some(Duration::from_secs_f32(1.0 / rate));
+    }
+
     /// get the frames per second, calculated with a sample size
     /// of n frames per second every n frames
     ///
     /// currently, n = 200
-    pub fn fps(&self) -> f32
+    pub fn current_frame_rate(&self) -> f32
     {
         self.fps.1
     }
 
-    /// since `Time::fps()` isn't calculated every frame, was it
-    /// calculated this frame?
-    pub fn fps_was_updated(&self) -> bool
-    {
-        self.tick % FPS_SAMPLE_SIZE == 0
-    }
-
     /// utility function that prints the current frames per second
     /// if and only if the frames per second has been recalculated
-    /// this frame. it's useful to call this function onc every frame
+    /// this frame. it's useful to call this function once every frame
     /// to get a [non-spammy] FPS report of your `Sketch`
-    pub fn print_fps(&self)
+    pub fn print_current_frame_rate(&self)
     {
         if self.fps_was_updated()
         {
-            println!("FPS: {:.2}", self.fps());
+            println!("FPS: {:.2}", self.current_frame_rate());
         }
+    }
+
+    /// since `Time::currentFrameRate()` isn't calculated every frame,
+    /// was it calculated this frame?
+    fn fps_was_updated(&self) -> bool
+    {
+        self.tick % FPS_SAMPLE_SIZE == 0
     }
 }

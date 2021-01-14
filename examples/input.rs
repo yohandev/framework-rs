@@ -21,7 +21,7 @@ impl Sketch for Baz
 
     fn update(&mut self, app: &mut App)
     {
-        app.time().print_fps();
+        app.time().print_current_frame_rate();
 
         self.mouse_pos = app.mouse().position();
     }
