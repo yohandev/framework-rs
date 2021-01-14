@@ -42,5 +42,9 @@ impl Sketch for Foo
         // use CSS colour codes.
         // complete list at https://colours.neilorangepeel.com
         c.stroke(c!("teal"));
+        c.fill(c!("purple"));
+        c.triangle(v![0, 0], v![10, 10], v![30, 20]);
+
+        c.stroke(c!("#f0f0f0"));
     }
 }

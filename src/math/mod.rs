@@ -75,13 +75,6 @@ macro_rules! v
 /// 
 /// assert_eq!(a, b);
 /// ```
-/// ...or hex codes:
-/// ```
-/// let a = c!("#F0FFF0");
-/// let b = c![0xf0, 0xff, 0xf0];
-///
-/// assert_eq!(a, b);
-/// ```
 #[macro_export]
 macro_rules! c
 {
