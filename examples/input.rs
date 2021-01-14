@@ -28,9 +28,9 @@ impl Sketch for Baz
 
     fn draw(&mut self, c: &mut Canvas)
     {
-        c.background(c!("plum"));
+        c.background(c!("darkslategray"));
 
-        c.fill(c!("skyblue"));
+        c.fill(c!("peru"));
         c.no_stroke();
 
         c.triangle(v![0, 50], v![0, 349], self.mouse_pos);

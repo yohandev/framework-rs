@@ -75,6 +75,8 @@ macro_rules! v
 /// 
 /// assert_eq!(a, b);
 /// ```
+/// the full list of colours can be found here:
+/// https://colours.neilorangepeel.com
 #[macro_export]
 macro_rules! c
 {
