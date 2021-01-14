@@ -6,11 +6,18 @@ use crate::math::*;
 
 /// represents a bitmap, which can be iterated and
 /// drawn to
+///
+/// the second generic argument `B` is the inner storage
+/// for pixels(raw [u8]) and `I` is this bitmap's ID, if
+/// any
 #[derive(Debug, Default)]
-pub struct Bitmap<T: Buf>
+pub struct Bitmap<I, B: Buf>
 {
+    /// this bitmap's ID
+    id: I,
+
     /// inner byte array representing this bitmap
-    inner: T,
+    inner: B,
     /// width and height, in pixels, of this bitmap
     size: Extent2<usize>,
 
@@ -24,10 +31,10 @@ pub struct Bitmap<T: Buf>
 /// pixel buffer
 pub trait Buf: AsRef<[u8]> + AsMut<[u8]> { }
 
-impl<T: Buf> Bitmap<T>
+impl<I, B: Buf> Bitmap<I, B>
 {
     /// create a new bitmap from its raw parts
-    pub fn new(inner: T, size: impl Into<Extent2<usize>>) -> Self
+    pub fn new(id: I, inner: B, size: impl Into<Extent2<usize>>) -> Self
     {
         // convert
         let size = size.into();
@@ -39,7 +46,7 @@ impl<T: Buf> Bitmap<T>
         let stroke = Some(Rgba::white());
         let fill = Some(Rgba::grey(0x80));
 
-        Self { inner, size, stroke, fill }
+        Self { id, inner, size, stroke, fill }
     }
 
     /// get this bitmap's width and height, in pixels
@@ -281,7 +288,7 @@ impl<T: Buf> Bitmap<T>
     /// pixels and (optionally) translating it
     ///
     /// the source bitmap isn't affected
-    pub fn image(&mut self, src: &Bitmap<impl Buf>, pos: Vec2<i32>)
+    pub fn image<U>(&mut self, src: &Bitmap<U, impl Buf>, pos: Vec2<i32>)
     {
         // givens
         let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
@@ -357,9 +364,9 @@ impl<T: Buf> Bitmap<T>
 }
 
 /// blanket implementation
-impl<T: AsRef<[u8]> + AsMut<[u8]>> Buf for T { }
+impl<B: AsRef<[u8]> + AsMut<[u8]>> Buf for B { }
 
-impl<T: Buf> Index<Vec2<i32>> for Bitmap<T>
+impl<I, B: Buf> Index<Vec2<i32>> for Bitmap<I, B>
 {
     type Output = Rgba<u8>;
 
@@ -376,7 +383,7 @@ impl<T: Buf> Index<Vec2<i32>> for Bitmap<T>
     }
 }
 
-impl<T: Buf> IndexMut<Vec2<i32>> for Bitmap<T>
+impl<I, B: Buf> IndexMut<Vec2<i32>> for Bitmap<I,B>
 {
     /// get the pixel color at the given position in pixels. panics if
     /// out of bound
@@ -385,44 +392,6 @@ impl<T: Buf> IndexMut<Vec2<i32>> for Bitmap<T>
     {
         // index
         let ind = pos.y as usize * self.width() + pos.x as usize;
-
-        // get
-        &mut self.pixels_mut()[ind]
-    }
-}
-
-impl<T: Buf> Index<Vec2<f32>> for Bitmap<T>
-{
-    type Output = Rgba<u8>;
-
-    /// get the pixel color at the given position in percentage. 
-    /// the input must be within the `0.0..=1.0` range, panics if
-    /// out of bound
-    #[inline]
-    fn index(&self, pos: Vec2<f32>) -> &Self::Output
-    {
-        // index
-        let x = pos.x * (self.width() - 1) as f32;
-        let y = pos.y * (self.height() - 1) as f32;
-        let ind = y as usize * self.width() + x as usize;
-
-        // get
-        &self.pixels()[ind]
-    }
-}
-
-impl<T: Buf> IndexMut<Vec2<f32>> for Bitmap<T>
-{
-    /// get the pixel color at the given position in percentage. 
-    /// the input must be within the `0.0..=1.0` range, panics if
-    /// out of bound
-    #[inline]
-    fn index_mut(&mut self, pos: Vec2<f32>) -> &mut Self::Output
-    {
-        // index
-        let x = pos.x * (self.width() - 1) as f32;
-        let y = pos.y * (self.height() - 1) as f32;
-        let ind = y as usize * self.width() + x as usize;
 
         // get
         &mut self.pixels_mut()[ind]
