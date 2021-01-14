@@ -54,10 +54,10 @@ impl Sketch for SnakeGame
         app.time().print_current_frame_rate();
 
         // input
-        if app.keys().pressed(btn!("left"))  { self.dir = v![-1, 0]; }
-        if app.keys().pressed(btn!("right")) { self.dir = v![ 1, 0]; }
-        if app.keys().pressed(btn!("up"))    { self.dir = v![ 0,-1]; }
-        if app.keys().pressed(btn!("down"))  { self.dir = v![ 0, 1]; }
+        if app.keys().pressed(btn!("left"))  && self.dir.x !=  1 { self.dir = v![-1, 0]; }
+        if app.keys().pressed(btn!("right")) && self.dir.x != -1 { self.dir = v![ 1, 0]; }
+        if app.keys().pressed(btn!("up"))    && self.dir.y !=  1 { self.dir = v![ 0,-1]; }
+        if app.keys().pressed(btn!("down"))  && self.dir.y != -1 { self.dir = v![ 0, 1]; }
 
         // no movement
         if self.dir == v![0, 0]
