@@ -84,12 +84,16 @@ impl Input
             Event::WindowEvent { window_id, event } =>
             {
                 // fetch window this event refers to
-                let window = windows.get(&window_id).unwrap();
-
-                // process mouse and keyboard
-                self.mouse.process(&event, window);
-                self.keys.process(&event);
-
+                //
+                // if window doesn't exist, we don't care do update
+                // its mouse/keyboard state
+                if let Some(window) = windows.get(&window_id)
+                {
+                    // process mouse and keyboard
+                    self.mouse.process(&event, window);
+                    self.keys.process(&event);
+                }
+                
                 // process additional
                 match event
                 {
