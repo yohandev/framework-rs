@@ -69,7 +69,19 @@ impl Sketch for SnakeGame
         self.snake[0] += self.dir;
         
         // out of grid -> game over!
-        if self.snake[0].is_any_negative() || !(GRID_SIZE - self.snake[0]).are_all_positive()
+        let neg_grid = self.snake[0]
+            .is_any_negative();
+        let pos_grid = self.snake[0]
+            .cmpge(&GRID_SIZE)
+            .reduce_or();
+        // head intersects with body -> game over!
+        let intersect = self.snake
+            .iter()
+            .skip(1)
+            .any(|&t| t == self.snake[0]);
+
+        // test game over
+        if neg_grid || pos_grid || intersect
         {
             *self = Self::default();
 
