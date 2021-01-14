@@ -42,17 +42,8 @@ pub mod prelude
         Sketch,
         App,
     };
-    // // macros...
-    // pub use crate::
-    // {
-    //     background,
-    //     stroke,
-    //     fill,
-    //     lines,
-    //     triangle
-    // };
     // macros...
-    pub use crate::{ c, v };
+    pub use crate::{ c, v, btn };
 }
 
 // run the sketch, hyjacking the main thread until all the

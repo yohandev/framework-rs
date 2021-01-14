@@ -37,11 +37,11 @@ impl Sketch for Foo
     // on every main events clear event.
     fn update(&mut self, app: &mut App)
     {
-        app.time().dt();            // delta time
-        app.keys().pressed(Key::A); // pressed this frame?
-        app.keys().down(Key::B);    // pressed at all?
-        app.mouse().down(Mouse::R); // same deal as keys
-        app.mouse().x();            // position in pixels
+        app.time().dt();                // delta time
+        app.keys().pressed(btn!("a"));  // pressed this frame?
+        app.keys().down(btn!("b"));     // pressed at all?
+        app.mouse().down(btn!("rmb"));  // same deal as keys
+        app.mouse().x();                // position in pixels
 
         if app.keys().pressed(Key::Space)
         {

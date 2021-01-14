@@ -1,3 +1,4 @@
+mod btn;
 mod mouse;
 mod keys;
 mod time;
@@ -88,7 +89,7 @@ impl Input
                 {
                     self.mouse.reset();
                     self.keys.reset();
-                    
+
                     self.reset = false;
                 }
 
