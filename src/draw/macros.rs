@@ -1,3 +1,5 @@
+//! discarded drawing macros
+
 /// clears the entire [Canvas] with the given
 /// colour.
 /// ```

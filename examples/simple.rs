@@ -19,7 +19,7 @@ impl Sketch for Foo
     fn draw(&mut self, c: &mut Canvas)
     {
         // clear background to blue
-        c.background(Rgba::blue());
+        c.background(c!("royalblue"));
 
         // draw a red line
         c.stroke(c![0xff, 0x00, 0x00]);
