@@ -347,30 +347,30 @@ impl<I, B: Buf> Bitmap<I, B>
 
     /// draws a rectangle with top-left corner at `pos` and of
     /// (width, height) `siz`. clips any pixels out of bounds.
-    pub fn rect(&mut self, mut pos: Vec2<i32>, mut siz: Vec2<i32>)
+    pub fn rect(&mut self, pos: Vec2<i32>, siz: Vec2<i32>)
     {
+        // size of this bitmap
+        let bounds: Vec2<i32> = self.size.as_().into();
+
+        // crop with top left corner(0, 0)
+        let siz = siz.map2(pos, |s, p| if p < 0 { s + p } else { s });
+        let pos = pos.map(|n| n.max(0));
+        // crop with bottom right corner(width - 1, height - 1)
+        let siz = siz.map3(pos, bounds, |siz, pos, bound|
+        {
+            let d = bound - (pos + siz);
+            if d < 0 { siz + d } else { siz }
+        });
+        
+        // empty rectangle
+        if siz.x <= 0 || siz.y <= 0
+        {
+            return;
+        }
+
         // fill
         if let Some(fill) = self.fill
         {
-            // size of this bitmap
-            let bounds: Vec2<i32> = self.size.as_().into();
-
-            // crop with top left corner(0, 0)
-            siz = siz.map2(pos, |s, p| if p < 0 { s + p } else { s });
-            pos = pos.map(|n| n.max(0));
-            // crop with bottom right corner(width - 1, height - 1)
-            siz = siz.map3(pos, bounds, |siz, pos, bound|
-            {
-                let d = bound - (pos + siz);
-                if d < 0 { siz + d } else { siz }
-            });
-            
-            // empty rectangle
-            if siz.x <= 0 || siz.y <= 0
-            {
-                return;
-            }
-
             // first line indices
             let first_ln_i = (pos.y * bounds.x + pos.x) as usize;
             let offset = first_ln_i + siz.x as usize;
@@ -390,6 +390,19 @@ impl<I, B: Buf> Bitmap<I, B>
 
                 dst[i..j].copy_from_slice(src);
             }
+        }
+        // stroke
+        if self.stroke.is_some()
+        {
+            let top_l = pos;
+            let btm_l = pos + Vec2::new(0, siz.y);
+            let top_r = pos + Vec2::new(siz.x, 0);
+            let btm_r = pos + siz;
+
+            self.line(top_l, top_r);
+            self.line(btm_l, btm_r);
+            self.line(top_l, btm_l);
+            self.line(top_r, btm_r);
         }
     }
 }

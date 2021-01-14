@@ -31,7 +31,7 @@ impl Sketch for Baz
         c.background(c!("darkslategray"));
 
         c.fill(c!("peru"));
-        c.no_stroke();
+        //c.no_stroke();
 
         c.rect(v![10, 10], self.mouse_pos - v![10, 10]);
         c.triangle(v![300, 50], v![300, 350], self.mouse_pos);
