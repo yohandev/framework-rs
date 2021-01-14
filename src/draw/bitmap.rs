@@ -345,46 +345,49 @@ impl<I, B: Buf> Bitmap<I, B>
         self.line(c, a);
     }
 
-    pub fn rect(&mut self, pos: Vec2<i32>, siz: Vec2<i32>)
+    pub fn rect(&mut self, mut pos: Vec2<i32>, mut siz: Vec2<i32>)
     {
-        // givens
-        let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
-        let src_size: Vec2<i32> = siz;
-
-        let dst_buf = self.raw_pixels_mut();
-
-        // copied from `Bitmap::image()`
-        let src_min = pos.map2(src_size, |p, s| (if p < 0 { -p } else { 0 }).min(s));
-        let src_max = pos.map3(src_size, dst_size, |p, ss, ds| if p + ss > ds { ds - p } else { ss });
-  
-        // copied from `Bitmap::image()`
-        let dst_min_x = if pos.x < 0 { 0 } else { pos.x };
-        let dst_max_x = dst_min_x + (src_max.x - src_min.x);
-
-        // draw first line
+        // fill
+        if let Some(fill) = self.fill
         {
-            let dst_str = (((y + pos.y) * dst_size.x * 4) + (dst_min_x * 4)) as usize;
-            let dst_end = (((y + pos.y) * dst_size.x * 4) + (dst_max_x * 4)) as usize;
+            // size of this bitmap
+            let bounds: Vec2<i32> = self.size.as_().into();
 
-        }
+            // crop with top left corner(0, 0)
+            siz = siz.map2(pos, |s, p| if p < 0 { s + p } else { s });
+            pos = pos.map(|n| n.max(0));
+            // crop with bottom right corner(width - 1, height - 1)
+            siz = siz.map3(pos, bounds, |siz, pos, bound|
+            {
+                let d = bound - (pos + siz);
+                if d < 0 { siz + d } else { siz }
+            });
+            
+            // empty rectangle
+            if siz.x <= 0 || siz.y <= 0
+            {
+                return;
+            }
 
-        // nothing to copy
-        if dst_max_x < dst_min_x
-        {
-            return;
-        }
+            // first line indices
+            let first_ln_i = (pos.y * bounds.x + pos.x) as usize;
+            let offset = first_ln_i + siz.x as usize;
 
-        // iterate vertically
-        for y in src_min.y..src_max.y
-        {
-            let src_str = ((y * src_size.x * 4) + (src_min.x * 4)) as usize;
-            let src_end = ((y * src_size.x * 4) + (src_max.x * 4)) as usize;
+            // split
+            let (src, dst) = self.pixels_mut().split_at_mut(offset);
 
-            let dst_str = (((y + pos.y) * dst_size.x * 4) + (dst_min_x * 4)) as usize;
-            let dst_end = (((y + pos.y) * dst_size.x * 4) + (dst_max_x * 4)) as usize;
+            // draw first line
+            let src = &mut src[first_ln_i..];
+            incremental_fill(src, fill);
 
-            // copy entire horizontal segments at once
-            dst_buf[dst_str..dst_end].copy_from_slice(&src_buf[src_str..src_end]);
+            // draw other lines by copying first line
+            for y in pos.y + 1..pos.y + siz.y
+            {
+                let i = (y * bounds.x + pos.x) as usize - offset;
+                let j = i + siz.x as usize;
+
+                dst[i..j].copy_from_slice(src);
+            }
         }
     }
 }

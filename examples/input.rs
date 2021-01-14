@@ -33,6 +33,7 @@ impl Sketch for Baz
         c.fill(c!("peru"));
         c.no_stroke();
 
-        c.triangle(v![0, 50], v![0, 349], self.mouse_pos);
+        c.rect(v![10, 10], self.mouse_pos - v![10, 10]);
+        c.triangle(v![300, 50], v![300, 350], self.mouse_pos);
     }
 }
