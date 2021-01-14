@@ -20,7 +20,6 @@ pub mod prelude
         Rgba,
         Extent2,
     };
-
     pub use crate::sound::
     {
         Track,
@@ -31,6 +30,11 @@ pub mod prelude
         Image,
         Canvas,
         CanvasId,
+    };
+    pub use crate::input::
+    {
+        MouseButton,
+        KeyCode,
     };
     pub use crate::
     {

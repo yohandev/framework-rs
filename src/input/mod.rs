@@ -2,8 +2,8 @@ mod mouse;
 mod keys;
 mod time;
 
-pub use self::mouse::Mouse;
-pub use self::keys::Keys;
+pub use self::mouse::{ Mouse, MouseButton };
+pub use self::keys::{ Keys, KeyCode };
 pub use self::time::Time;
 
 use crate::app::Windows;
