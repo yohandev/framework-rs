@@ -12,6 +12,7 @@ use crate::Sketch;
 /// handle to the application running this `Sketch`.
 /// this is how `Canvas`es are created or input and
 /// time is accessed.
+#[derive(Debug)]
 pub struct App
 {
     /// input state
@@ -20,13 +21,22 @@ pub struct App
     time: Time,
 
     /// windows currently open
-    windows: HashMap::<WindowId, Window>,
-    /// maps canvas id to window id
-    canvases: HashMap<CanvasId, WindowId>,
+    windows: Windows,
     /// window creation requests
     requests: Vec<(CanvasId, String, Extent2<usize>)>,
     /// next window request ID
     next: CanvasId,
+}
+
+/// double-key'd hashmap of `CanvasId` and `WindowId`s
+/// pointing to existing and open `Window`s
+#[derive(Debug, Default)]
+pub(crate) struct Windows
+{
+    /// maps canvas id to window id
+    id: HashMap<CanvasId, WindowId>,
+    /// maps windows id to windows currently open
+    win: HashMap::<WindowId, Window>
 }
 
 impl App
@@ -38,8 +48,7 @@ impl App
         {
             input: Input::new(),
             time: Time::new(),
-            windows: HashMap::new(),
-            canvases: HashMap::new(),
+            windows: Windows::default(),
             requests: Vec::new(),
             next: CanvasId::zero(),
         }
@@ -69,7 +78,7 @@ impl App
             ProcessedEvent::WindowClose(id) =>
             {
                 // stop keeping track of and drop window
-                self.windows.remove(&id);
+                self.windows.remove2(&id);
 
                 // quit?
                 if self.windows.is_empty()
@@ -106,7 +115,7 @@ impl App
                 self.process_requests(window_target);
                 
                 // request a redraw on each window
-                for (_, window) in self.windows.iter_mut()
+                for window in self.windows.iter_mut()
                 {
                     window.winit.request_redraw();
                 }
@@ -122,10 +131,7 @@ impl App
     {
         while let Some((id, title, size)) = self.requests.pop()
         {
-            let window = Window::new(target, title, size, id);
-
-            self.canvases.insert(id, window.winit.id());
-            self.windows.insert(window.winit.id(), window);
+            self.windows.insert(id, Window::new(target, title, size, id));
         }
     }
 
@@ -173,9 +179,54 @@ impl App
     /// does nothing if it doesn't
     pub fn destroy_canvas(&mut self, id: CanvasId)
     {
-        if let Some(id) = self.canvases.remove(&id)
+        self.windows.remove(&id);
+    }
+}
+
+impl Windows
+{
+    /// mutably get a window given its `WindowId`
+    pub fn get_mut(&mut self, id: &WindowId) -> Option<&mut Window>
+    {
+        self.win.get_mut(id)
+    }
+
+    /// insert a window given its `CanvasId`
+    pub fn insert(&mut self, id: CanvasId, window: Window)
+    {
+        self.id.insert(id, window.winit.id());
+        self.win.insert(window.winit.id(), window);
+    }
+
+    /// remove a window given its `CanvasId`
+    pub fn remove(&mut self, id: &CanvasId) 
+    {
+        if let Some(id) = self.id.remove(&id)
         {
-            self.windows.remove(&id);
+            self.win.remove(&id);
         }
+    }
+
+    /// remove a window given its `WindowId`
+    pub fn remove2(&mut self, id: &WindowId) 
+    {
+        if let Some(Window { id, .. }) = self.win.remove(&id)
+        {
+            self.id.remove(&id);
+        }
+    }
+
+    /// is `self` empty of `Window`s?
+    pub fn is_empty(&mut self) -> bool
+    {
+        debug_assert_eq!(self.win.is_empty(), self.id.is_empty());
+
+        self.win.is_empty()
+    }
+
+    /// mutuably iterate over all the windows in 
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut Window>
+    {
+        self.win.values_mut()
     }
 }
