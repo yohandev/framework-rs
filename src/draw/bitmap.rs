@@ -9,7 +9,7 @@ use crate::math::*;
 ///
 /// the second generic argument `B` is the inner storage
 /// for pixels(raw [u8]) and `I` is this bitmap's ID, if
-/// any
+/// any. that ID should be `Copy` to access it later
 #[derive(Debug, Default)]
 pub struct Bitmap<I, B: Buf>
 {
@@ -47,6 +47,14 @@ impl<I, B: Buf> Bitmap<I, B>
         let fill = Some(Rgba::grey(0x80));
 
         Self { id, inner, size, stroke, fill }
+    }
+
+    /// get this bitmap' ID if it's used(otherwise
+    /// get returns an empty tuple)
+    #[inline]
+    pub fn id(&self) -> &I
+    {
+        &self.id
     }
 
     /// get this bitmap's width and height, in pixels

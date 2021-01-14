@@ -9,7 +9,7 @@ use crate::draw::Bitmap;
 /// can
 ///
 /// [Bitmap]: crate::Bitmap
-pub type Image = Bitmap<Vec<u8>>;
+pub type Image = Bitmap<(), Vec<u8>>;
 
 impl Image
 {
@@ -21,7 +21,7 @@ impl Image
         {
             let size = Extent2::new(img.width(), img.height()).as_();
 
-            Bitmap::new(img.into_rgba8().into_raw(), size)
+            Bitmap::new((), img.into_rgba8().into_raw(), size)
         })
     }
 }

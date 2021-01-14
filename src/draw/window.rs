@@ -54,13 +54,6 @@ impl Window
     /// get the next canvas to draw to
     pub(crate) fn get_frame(&mut self) -> Canvas
     {
-        let buf = self.pixels.get_frame();
-        
-        Canvas
-        {
-            inner: Bitmap::new(buf, self.size),
-            window: &self.winit,
-            id: self.id
-        }
+        Bitmap::new(self.id, self.pixels.get_frame(), self.size)
     }
 }

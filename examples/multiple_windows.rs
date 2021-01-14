@@ -20,15 +20,15 @@ impl Sketch for Bar
 
     fn draw(&mut self, c: &mut Canvas)
     {
-        if c.id() == self.0
+        if c.id() == &self.0
         {
             c.background(Rgba::blue());
         }
-        else if c.id() == self.1
+        else if c.id() == &self.1
         {
             c.background(Rgba::yellow());
         }
-        else if c.id() == self.2
+        else if c.id() == &self.2
         {
             c.background(Rgba::green());
         }
