@@ -6,13 +6,13 @@ fn main()
 }
 
 /// (width, height) tiles in the game
-const GRID_SIZE: Vec2<i32> = v![31, 31];
+const GRID_SIZE: Vec2<i32> = v![61, 61];
 /// (width, height) of a single tile, in pixels
-const TILE_SIZE: Vec2<i32> = v![10, 10];
+const TILE_SIZE: Vec2<i32> = v![8, 8];
 /// starting length of the snake
 const START_LEN: usize = 5;
 /// period between food generation, in tick(frames)
-const FOOD_RATE: u64 = 40;
+const FOOD_RATE: u64 = 60;
 
 struct SnakeGame
 {
@@ -32,7 +32,7 @@ impl Sketch for SnakeGame
     fn setup(app: &mut App) -> Self
     {
         app.create_canvas("snake", (GRID_SIZE * TILE_SIZE).as_());
-        app.time().frame_rate(10.0);
+        app.time().frame_rate(20.0);
 
         Self::default()
     }
