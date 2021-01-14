@@ -264,32 +264,7 @@ impl<I, B: Buf> Bitmap<I, B>
     /// colors.
     pub fn background(&mut self, col: Rgba<u8>)
     {
-        // get the buffer
-        let buf = self.pixels_mut();
-
-        // set the first pixel
-        buf[0] = col;
-
-        // size is how much has been done so far(also the cursor)
-        // rem is how much to be populated and may go below zero
-        let mut siz = 1;
-        let mut rem = buf.len() as isize;
-
-        while rem > 0
-        {
-            // split what's already been cleared and what's remaining
-            let (src, dst) = buf.split_at_mut(siz);
-
-            // upper-bound index to copy
-            let cpy = dst.len().min(siz);
-
-            // copy over to clear some more
-            dst[0..cpy].copy_from_slice(&src[0..cpy]);
-
-            // grow by a factor of 2
-            rem -= siz as isize;
-            siz *= 2;
-        }
+        incremental_fill(self.pixels_mut(), col);
     }
 
     /// paste another bitmap on top of this one, clipping any invisible
@@ -369,6 +344,49 @@ impl<I, B: Buf> Bitmap<I, B>
         self.line(b, c);
         self.line(c, a);
     }
+
+    pub fn rect(&mut self, pos: Vec2<i32>, siz: Vec2<i32>)
+    {
+        // givens
+        let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
+        let src_size: Vec2<i32> = siz;
+
+        let dst_buf = self.raw_pixels_mut();
+
+        // copied from `Bitmap::image()`
+        let src_min = pos.map2(src_size, |p, s| (if p < 0 { -p } else { 0 }).min(s));
+        let src_max = pos.map3(src_size, dst_size, |p, ss, ds| if p + ss > ds { ds - p } else { ss });
+  
+        // copied from `Bitmap::image()`
+        let dst_min_x = if pos.x < 0 { 0 } else { pos.x };
+        let dst_max_x = dst_min_x + (src_max.x - src_min.x);
+
+        // draw first line
+        {
+            let dst_str = (((y + pos.y) * dst_size.x * 4) + (dst_min_x * 4)) as usize;
+            let dst_end = (((y + pos.y) * dst_size.x * 4) + (dst_max_x * 4)) as usize;
+
+        }
+
+        // nothing to copy
+        if dst_max_x < dst_min_x
+        {
+            return;
+        }
+
+        // iterate vertically
+        for y in src_min.y..src_max.y
+        {
+            let src_str = ((y * src_size.x * 4) + (src_min.x * 4)) as usize;
+            let src_end = ((y * src_size.x * 4) + (src_max.x * 4)) as usize;
+
+            let dst_str = (((y + pos.y) * dst_size.x * 4) + (dst_min_x * 4)) as usize;
+            let dst_end = (((y + pos.y) * dst_size.x * 4) + (dst_max_x * 4)) as usize;
+
+            // copy entire horizontal segments at once
+            dst_buf[dst_str..dst_end].copy_from_slice(&src_buf[src_str..src_end]);
+        }
+    }
 }
 
 /// blanket implementation
@@ -403,5 +421,38 @@ impl<I, B: Buf> IndexMut<Vec2<i32>> for Bitmap<I,B>
 
         // get
         &mut self.pixels_mut()[ind]
+    }
+}
+
+/// incrementally fill a slice `buf` with `ele`
+/// using a progressively larger memcpy...
+/// 
+/// works setting buf[0], then copying that to
+/// buf[0..2], then copying buf[0..2] to buf[2..4],
+/// then buf[0..4] to buf[4..8], etc.
+fn incremental_fill<T: Copy>(buf: &mut [T], ele: T)
+{
+    // set the first element
+    buf[0] = ele;
+
+    // size is how much has been done so far(also the cursor)
+    // rem is how much to be populated and may go below zero
+    let mut siz = 1;
+    let mut rem = buf.len() as isize;
+
+    while rem > 0
+    {
+        // split what's already been cleared and what's remaining
+        let (src, dst) = buf.split_at_mut(siz);
+
+        // upper-bound index to copy
+        let cpy = dst.len().min(siz);
+
+        // copy over to clear some more
+        dst[0..cpy].copy_from_slice(&src[0..cpy]);
+
+        // grow by a factor of 2
+        rem -= siz as isize;
+        siz *= 2;
     }
 }
