@@ -345,6 +345,8 @@ impl<I, B: Buf> Bitmap<I, B>
         self.line(c, a);
     }
 
+    /// draws a rectangle with top-left corner at `pos` and of
+    /// (width, height) `siz`. clips any pixels out of bounds.
     pub fn rect(&mut self, mut pos: Vec2<i32>, mut siz: Vec2<i32>)
     {
         // fill
