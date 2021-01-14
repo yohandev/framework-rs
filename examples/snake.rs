@@ -7,11 +7,11 @@ fn main()
 }
 
 /// (width, height) tiles in the game
-const GRID_SIZE: Vec2<i32> = v![30, 30];
+const GRID_SIZE: Vec2<i32> = v![31, 31];
 /// (width, height) of a single tile, in pixels
 const TILE_SIZE: Vec2<i32> = v![10, 10];
 /// starting length of the snake
-const START_LEN: i32 = 5;
+const START_LEN: usize = 5;
 
 struct SnakeGame
 {
@@ -34,7 +34,7 @@ impl Sketch for SnakeGame
         {
             // creates a snake with head in middle, and tail one
             // unit below it
-            snake: (0..START_LEN).map(|n| GRID_SIZE / 2 + v![0, n]).collect(),
+            snake: [GRID_SIZE / 2; START_LEN].into(),
             dir: v![0, 0],
         }
     }
