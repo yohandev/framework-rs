@@ -44,7 +44,5 @@ impl Sketch for Foo
         c.stroke(c!("teal"));
         c.fill(c!("purple"));
         c.triangle(v![0, 0], v![10, 10], v![30, 20]);
-
-        c.stroke(c!("#f0f0f0"));
     }
 }
