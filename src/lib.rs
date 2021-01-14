@@ -44,6 +44,9 @@ pub mod prelude
     };
     // macros...
     pub use crate::{ c, v, btn };
+
+    // re-exports
+    pub use rand::Rng;
 }
 
 // run the sketch, hyjacking the main thread until all the

@@ -4,6 +4,8 @@ use winit::event_loop::{ ControlFlow, EventLoopWindowTarget as WindowTarget };
 use winit::window::WindowId;
 use winit::event::Event;
 
+use rand::prelude::ThreadRng;
+
 use crate::input::{ Input, Mouse, Keys, Time, ProcessedEvent };
 use crate::draw::{ CanvasId, Window };
 use crate::math::Extent2;
@@ -26,6 +28,9 @@ pub struct App
     requests: Vec<(CanvasId, String, Extent2<usize>)>,
     /// next window request ID
     next: CanvasId,
+
+    /// extra utility: random
+    rand: ThreadRng,
 }
 
 /// double-key'd hashmap of `CanvasId` and `WindowId`s
@@ -51,6 +56,7 @@ impl App
             windows: Windows::default(),
             requests: Vec::new(),
             next: CanvasId::zero(),
+            rand: ThreadRng::default(),
         }
     }
 
@@ -185,6 +191,12 @@ impl App
     pub fn destroy_canvas(&mut self, id: CanvasId)
     {
         self.windows.remove(&id);
+    }
+
+    /// get this app's random number generator
+    pub fn random(&mut self) -> &mut ThreadRng
+    {
+        &mut self.rand
     }
 }
 
