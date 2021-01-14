@@ -6,6 +6,7 @@ pub use self::mouse::Mouse;
 pub use self::keys::Keys;
 pub use self::time::Time;
 
+use crate::app::Windows;
 
 use winit::window::WindowId;
 use winit::event::Event;
@@ -66,7 +67,7 @@ impl Input
     }
 
     /// process a raw incoming winit event
-    pub(crate) fn process(&mut self, event: Event<()>) -> ProcessedEvent
+    pub(crate) fn process(&mut self, event: Event<()>, windows: &Windows) -> ProcessedEvent
     {
         use winit::event::WindowEvent;
 
@@ -82,8 +83,11 @@ impl Input
             }
             Event::WindowEvent { window_id, event } =>
             {
+                // fetch window this event refers to
+                let window = windows.get(&window_id).unwrap();
+
                 // process mouse and keyboard
-                self.mouse.process(&event);
+                self.mouse.process(&event, window);
                 self.keys.process(&event);
 
                 // process additional

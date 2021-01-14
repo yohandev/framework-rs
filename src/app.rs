@@ -64,7 +64,7 @@ impl App
         control_flow: &mut ControlFlow
     )
     {
-        match self.input.process(event)
+        match self.input.process(event, &self.windows)
         {
             // notify `Pixels` of the window resize
             ProcessedEvent::WindowResized(id, (w, h)) =>
@@ -185,6 +185,12 @@ impl App
 
 impl Windows
 {
+    /// get a window given its `WindowId`
+    pub fn get(&self, id: &WindowId) -> Option<&Window>
+    {
+        self.win.get(id)
+    }
+
     /// mutably get a window given its `WindowId`
     pub fn get_mut(&mut self, id: &WindowId) -> Option<&mut Window>
     {
