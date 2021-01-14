@@ -1,6 +1,7 @@
 use winit::event::WindowEvent;
 
 use crate::input::InputState;
+use crate::draw::Window;
 use crate::math::Vec2;
 
 /// represents the present state of the mouse,
@@ -11,10 +12,10 @@ use crate::math::Vec2;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Mouse
 {
-    /// current mouse position
-    pos: Vec2<f64>,
-    /// delta mouse position
-    del: Vec2<f64>,
+    /// current mouse position in canvas pixels
+    pos: Vec2<i32>,
+    /// delta mouse position in canvas pixels
+    del: Vec2<i32>,
 
     /// mouse button states where index is a mouse button
     btn: [InputState; 255],
@@ -63,13 +64,20 @@ impl Mouse
 
     /// update the internal input states within `self` using
     /// the relevant winit-provided event
-    pub(super) fn process(&mut self, event: &WindowEvent)
-    {        
+    pub(super) fn process(&mut self, event: &WindowEvent, window: &Window)
+    {
         match event
         {
             WindowEvent::CursorMoved { position, .. } =>
             {
-                let pos = Vec2::new(position.x, position.y);
+                // raw physical position
+                let pos = (position.x as f32, position.y as f32);
+                // clip to canvas
+                let (x, y) = window.pixels
+                    .window_pos_to_pixel(pos)
+                    .unwrap_or_else(|pos| window.pixels.clamp_pixel_pos(pos));
+                // convert
+                let pos = Vec2::new(x as i32, y as i32);
 
                 self.del = pos - self.pos;
                 self.pos = pos;
@@ -142,16 +150,10 @@ impl Mouse
     }
 
     /// current mouse position, in window pixel coordinates.
-    /// note: this may be out of the canvas' bounds
+    /// note: this is guaranteed to be within the canvas'
+    /// bounds unless it was rescaled
     #[inline]
     pub fn position(&self) -> Vec2<i32>
-    {
-        (self.pos * 0.5).as_()
-    }
-
-    /// get the raw mouse position relative to the window,
-    /// directly from winit
-    pub fn raw_position(&self) -> Vec2<f64>
     {
         self.pos
     }
@@ -160,33 +162,33 @@ impl Mouse
     #[inline]
     pub fn x(&self) -> i32
     {
-        (self.pos.x * 0.5) as i32
+        self.pos.x
     }
 
     /// shortcut for `Mouse::position().y`
     #[inline]
     pub fn y(&self) -> i32
     {
-        (self.pos.y * 0.5) as i32
+        self.pos.y
     }
 
     /// delta mouse position, in window pixel coordinates
     #[inline]
-    pub fn delta(&self) -> Vec2<f64>
+    pub fn delta(&self) -> Vec2<i32>
     {
         self.del
     }
 
     /// shortcut for `Mouse::delta().x`
     #[inline]
-    pub fn dx(&self) -> f64
+    pub fn dx(&self) -> i32
     {
         self.del.x
     }
 
     /// shortcut for `Mouse::delta().x`
     #[inline]
-    pub fn dy(&self) -> f64
+    pub fn dy(&self) -> i32
     {
         self.del.y
     }
