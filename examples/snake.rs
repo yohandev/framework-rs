@@ -1,5 +1,4 @@
 use framework::prelude::*;
-use framework::math::Wrap;
 
 fn main()
 {
@@ -30,23 +29,19 @@ impl Sketch for SnakeGame
         app.create_canvas("snake", (GRID_SIZE * TILE_SIZE).as_());
         app.time().frame_rate(10.0);
 
-        Self
-        {
-            // creates a snake with head in middle, and tail one
-            // unit below it
-            snake: [GRID_SIZE / 2; START_LEN].into(),
-            dir: v![0, 0],
-        }
+        Self::default()
     }
 
     fn draw(&mut self, c: &mut Canvas)
     {
+        // clear screen
         c.background(c!("darkslategrey"));
 
-        // draw tiles
+        // tile style
         c.fill(c!("honeydew"));
         c.no_stroke();
 
+        // draw tiles
         for tile in &self.snake
         {
             c.rect(tile * TILE_SIZE, TILE_SIZE);
@@ -73,13 +68,33 @@ impl Sketch for SnakeGame
         // move head
         self.snake[0] += self.dir;
         
-        // out of grid -> wrap around
-        self.snake[0] = self.snake[0].wrapped(GRID_SIZE);
+        // out of grid -> game over!
+        if self.snake[0].is_any_negative() || !(GRID_SIZE - self.snake[0]).are_all_positive()
+        {
+            *self = Self::default();
+
+            return println!("GAME OVER!");
+        }
 
         // move body
         for i in (1..self.snake.len()).rev()
         {
             self.snake[i] = self.snake[i - 1];
+        }
+    }
+}
+
+impl Default for SnakeGame
+{
+    fn default() -> Self
+    {
+        Self
+        {
+            // creates a snake with head in middle, and tail one
+            // unit below it
+            snake: [GRID_SIZE / 2; START_LEN].into(),
+            // doesn't move at first
+            dir: v![0, 0],
         }
     }
 }
