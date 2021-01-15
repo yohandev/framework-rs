@@ -1,3 +1,8 @@
+mod chunk;
+mod buf;
+
+pub use self::chunk::Chunk;
+
 use std::ops::{ Index, IndexMut };
 
 use rayon::prelude::*;
@@ -236,7 +241,7 @@ impl<I, B: Buf> Bitmap<I, B>
     /// [ChunksExact]: std::slice::ChunksExact
     pub fn iter_pixel_chunks(&self, size: impl Into<Extent2<usize>>) -> impl Iterator<Item = super::Chunk<'_>>
     {
-        super::chunk::iter_pixel_chunks(self, size.into())
+        self::chunk::iter_pixel_chunks(self, size.into())
     }
 
     /// set the fill colour to be used for any future drawing calls.
