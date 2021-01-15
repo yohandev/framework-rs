@@ -9,26 +9,35 @@ framework = { git = "https://github.com/yohandev/framework-rs" }
 ```
 ...then:
 ```rust
-use framework::math::*;
-use framework::*;
+use framework::prelude::*;
 
 fn main()
 {
-    run::<MySketch>();
+    framework::run::<Foo>();
 }
 
-struct MySketch;
+struct Foo;
 
-impl App for MySketch
+impl Sketch for Foo
 {
-    fn render(&mut self, frame: &mut Frame)
+    fn setup(app: &mut App) -> Self
     {
-        frame.clear(Rgba::black());
+        app.create_canvas("Foo", (400, 300));
+
+        Foo
     }
 
-    fn update(&mut self, time: &Time)
+    fn draw(&mut self, c: &mut Canvas)
     {
-        println!("FPS: {:.1}", 1.0 / time.dt())
+        // clear background to blue
+        c.background(c!("royalblue"));
+
+        // set the stroke and colour using CSS colour codes.
+        c.stroke(c!("teal"));
+        c.fill(c!("purple"));
+
+        // draw some shape
+        c.triangle(v![0, 0], v![10, 10], v![30, 20]);
     }
 }
 ```
