@@ -234,9 +234,9 @@ impl<I, B: Buf> Bitmap<I, B>
     /// this method is comparable to a 2D version of [ChunksExact]
     ///
     /// [ChunksExact]: std::slice::ChunksExact
-    pub fn iter_pixel_chunks(&self, size: Extent2<usize>) -> impl Iterator<Item = super::Chunk<'_>>
+    pub fn iter_pixel_chunks(&self, size: impl Into<Extent2<usize>>) -> impl Iterator<Item = super::Chunk<'_>>
     {
-        super::chunk::iter_pixel_chunks(self, size)
+        super::chunk::iter_pixel_chunks(self, size.into())
     }
 
     /// set the fill colour to be used for any future drawing calls.

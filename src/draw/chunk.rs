@@ -16,7 +16,10 @@ pub struct Chunk<'a>
     /// where &A, &B, and &C are assumed to be
     /// in non-contiguous memory
     /// ```
-    buf: Box<[&'a [Rgba<u8>]]>
+    buf: Box<[&'a [Rgba<u8>]]>,
+    /// position, in pixel space, of the top-left
+    /// corner of this chunk
+    pos: Vec2<i32>,
 }
 
 /// `Bitmap::iter_pixel_chunks` implementation
@@ -25,13 +28,13 @@ pub(crate) fn iter_pixel_chunks<S>(bitmap: &Bitmap<S, impl Buf>, size: Extent2<u
     // iterate in row-by-row zig-zag pattern
     (0..bitmap.height() / size.h)
         // do the cartesian product
-        .flat_map(move |x| (0..bitmap.width() / size.w).map(move |y| (x, y)))
+        .flat_map(move |y| (0..bitmap.width() / size.w).map(move |x| (x, y)))
         // once we have zig-zag indices, begin dividing chunks:
         .map(move |(x, y)|
         {
             // (x, y) is chunk index; remap to top-left corner in pixel
             // space
-            let pos = Vec2::new(x * bitmap.width(), y * bitmap.height());
+            let pos = Vec2::new(x * size.w, y * size.h);
 
             // create sparse 2D buffer(see `Chunks::buf` doc)
             let buf = (pos.y..pos.y + size.h)
@@ -45,9 +48,23 @@ pub(crate) fn iter_pixel_chunks<S>(bitmap: &Bitmap<S, impl Buf>, size: Extent2<u
                 })
                 .collect::<Box<_>>();
             
+            // convert pos
+            let pos = pos.as_();
+            
             // return chunks
-            Chunk { buf }
+            Chunk { buf, pos }
         })
+}
+
+impl<'a> Chunk<'a>
+{
+    /// get the position, in pixel space, of the top-left
+    /// corner of this `Chunk`
+    #[inline]
+    pub fn pos(&self) -> Vec2<i32>
+    {
+        self.pos
+    }
 }
 
 impl<'a> Index<Vec2<i32>> for Chunk<'a>
