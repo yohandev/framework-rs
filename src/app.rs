@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::path::Path;
 
 use winit::event_loop::{ ControlFlow, EventLoopWindowTarget as WindowTarget };
 use winit::window::WindowId;
@@ -7,6 +8,7 @@ use winit::event::Event;
 use rand::prelude::ThreadRng;
 
 use crate::input::{ Input, Mouse, Keys, Time, ProcessedEvent };
+use crate::sound::{ Audio, Track, Sample };
 use crate::draw::{ CanvasId, Window };
 use crate::math::Extent2;
 use crate::Sketch;
@@ -14,7 +16,7 @@ use crate::Sketch;
 /// handle to the application running this `Sketch`.
 /// this is how `Canvas`es are created or input and
 /// time is accessed.
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct App
 {
     /// input state
@@ -28,6 +30,9 @@ pub struct App
     requests: Vec<(CanvasId, String, Extent2<usize>)>,
     /// next window request ID
     next: CanvasId,
+
+    /// audio context
+    audio: Audio,
 
     /// extra utility: random
     rand: ThreadRng,
@@ -56,6 +61,7 @@ impl App
             windows: Windows::default(),
             requests: Vec::new(),
             next: CanvasId::zero(),
+            audio: Audio::new(),
             rand: ThreadRng::default(),
         }
     }
@@ -191,6 +197,19 @@ impl App
     pub fn destroy_canvas(&mut self, id: CanvasId)
     {
         self.windows.remove(&id);
+    }
+
+    /// loads a sound [Track] at the given path, if it exists.
+    /// supports formats with extensions:
+    /// - flac(".flac")
+    /// - ogg vorbis(".ogg", ".oga")
+    /// - wav(".wav", ".wave")
+    /// - alac(".caf")
+    ///
+    /// [Track]: crate::audio::Track
+    pub fn load_sound<S: Sample>(&self, path: impl AsRef<Path>) -> Track<S>
+    {
+        Track::open(path, &self.audio).unwrap()
     }
 
     /// get this app's random number generator
