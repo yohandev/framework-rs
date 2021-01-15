@@ -12,9 +12,10 @@ impl Sketch for Foo
 
         // load audio. the first app.audio() call
         // initializes audio subsystem
-        let song = app.audio().load("piano.ogg");
+        let song = app.load_sound("piano.ogg");
+        let img = app.load_image("trees.png");
 
-        Foo { song }
+        Foo { song, img }
     }
 
     // only called if a canvas exists. then, it is
@@ -31,6 +32,8 @@ impl Sketch for Foo
         c.fill(c![0x23, 0xff, 0x12, 0xff]);
         c.triangle(v![20, 50], v![1, 2], v![50, 80]);
         c.ellipse(v![70, 70], v![10, 99]);
+
+        c.image(&self.img, v![400, 200]);
     }
 
     // update the sketch state [and app]. called
@@ -45,15 +48,11 @@ impl Sketch for Foo
 
         if app.keys().pressed(Key::Space)
         {
-            app.audio().play(&self.song);
-        }
-        else if app.keys().pressed(Key::Backspace)
-        {
-            app.audio().pause(&self.song);
-        }
-        else if app.keys().pressed(Key::P)
-        {
-            app.audio().resume(&self.song);
+            match self.song.is_playing()
+            {
+                false => song.play(),
+                true => song.pause(),
+            }
         }
     }
 
