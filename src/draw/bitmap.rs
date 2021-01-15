@@ -10,7 +10,7 @@ use crate::math::*;
 /// the second generic argument `B` is the inner storage
 /// for pixels(raw [u8]) and `I` is this bitmap's ID, if
 /// any. that ID should be `Copy` to access it later
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Bitmap<I, B: Buf>
 {
     /// this bitmap's ID
@@ -225,6 +225,18 @@ impl<I, B: Buf> Bitmap<I, B>
             .par_iter_mut()
             .enumerate()
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
+    }
+
+    /// iterate non-overlapping "sub-bitmaps" or "chunks" in this bitmap,
+    /// of size `size`. the remaining pixels, if any, are discarded from
+    /// the iterator
+    ///
+    /// this method is comparable to a 2D version of [ChunksExact]
+    ///
+    /// [ChunksExact]: std::slice::ChunksExact
+    pub fn iter_pixel_chunks(&self, size: Extent2<usize>) -> impl Iterator<Item = super::Chunk<'_>>
+    {
+        super::chunk::iter_pixel_chunks(self, size)
     }
 
     /// set the fill colour to be used for any future drawing calls.
