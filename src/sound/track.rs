@@ -1,85 +1,234 @@
-use crate::sound::sample::{ Sample, SampleType };
+use std::time::Duration;
+use std::path::Path;
+use std::sync::Arc;
 
-/// an iterator that specifically yields samples to be
-/// written to an audio output stream
-pub trait Track: Send + Sync + 'static
+use crate::sound::Sample;
+
+use super::Audio;
+
+/// represents an audio track, with playback, volume,
+/// and other audio controls. supported formats include:
+/// - flac(".flac")
+/// - ogg vorbis(".ogg", ".oga")
+/// - wav(".wav", ".wave")
+/// - alac(".caf")
+pub struct Track<S: Sample>
 {
-    /// format of the sample returned by this iterator
-    type Format: Sample;
+    /// sink to control playback
+    sink: rodio::Sink,
 
-    /// get the next sample (and?) increment self for
-    /// the next iteration
-    fn next_sample(&mut self) -> Option<Self::Format>;
-
-    /// called once whenever this track is passed to a
-    /// `Speakers` instance
-    fn tune(&mut self, channels: usize, sample_rate: usize);
+    /// this audio file's interleaved samples
+    samples: Arc<[S]>,
+    /// number of channels in this track
+    channel_count: usize,
+    /// sample rate of this track
+    sample_rate: usize,
 }
 
-/// abstraction over `Track` to permit dynamic
-/// types. it works directly with bytes and
-/// has access to the entire stream segment, rather
-/// than working like an iterator
-pub trait RawTrack: Send + Sync + 'static
+/// internal track that's actually passed to the rodio
+/// Sink and serves samples
+struct TrackSource<S: Sample>
 {
-    /// write `self`'s next sample directly to the stream.
-    /// keep on writing until either `self as Track`
-    /// is exhausted or the end of `stream` is reached.
-    ///
-    /// assumes `stream % sizeof(format) == 0`
-    ///
-    /// returns `true` if `self as Track` is done
-    fn write_samples(&mut self, stream: &mut [u8], format: SampleType) -> bool;
+    /// keeps track of what index it's at
+    /// also the number of samples read
+    ind: usize,
 
-    /// called once whenever this track is passed to a
-    /// `Speakers` instance
-    fn tune(&mut self, channels: usize, sample_rate: usize);
+    /// this audio file's interleaved samples
+    samples: Arc<[S]>,
+    /// number of channels in this track
+    channel_count: u16,
+    /// sample rate of this track
+    sample_rate: u32,   
 }
 
-impl<S: Sample, T: Track<Format = S>> RawTrack for T
+/// an error while reading an audio file, either io or format
+pub type TrackError = audrey::read::ReadError;
+
+impl<S: Sample> Track<S>
 {
-    fn write_samples(&mut self, mut stream: &mut [u8], format: SampleType) -> bool
+    /// Attempts to open a `Track` at the specified `Path`.
+    ///
+    /// The format is determined from the path's file extension.
+    pub fn open(path: impl AsRef<Path>, audio: &Audio) -> Result<Self, TrackError>
     {
-        macro_rules! write_samples
+        // read the audio file
+        let mut reader = audrey::open(path)?;
+
+        // collet the samples
+        let samples = reader
+            .samples()
+            .map(Result::unwrap)
+            .collect::<Arc<[_]>>();
+        
+        // description
+        let desc = reader.description();
+        let sample_rate = desc.sample_rate() as usize;
+        let channel_count = desc.channel_count() as usize;
+
+        // sink
+        let sink = rodio::Sink::try_new(&audio.handle).unwrap();
+        sink.append(TrackSource
         {
-            ($ty:ident, $siz:literal) =>
-            {
-                loop
-                {
-                    // done with stream segment but not track
-                    if stream.is_empty() { break false; }
+            ind: 0,
+            samples: Arc::clone(&samples),
+            channel_count: channel_count as u16,
+            sample_rate: sample_rate as u32,
+        });
+        // pause by default
+        sink.pause();
 
-                    // not done with track
-                    if let Some(s) = self.next_sample()
-                    {
-                        // write next sample
-                        stream[0..$siz].copy_from_slice(&s.$ty().to_ne_bytes());
+        Ok(Self { sink, samples, channel_count, sample_rate })
+    }
 
-                        // next iteration
-                        stream = &mut stream[$siz..];
-                    }
-                    // done with track
-                    else
-                    {
-                        break true;
-                    }
-                }
-            }
+    /// start playing or resume playback of this track
+    ///
+    /// no effect if not paused
+    #[inline]
+    pub fn play(&self)
+    {
+        self.sink.play();
+    }
+
+    /// stop playing playback of this track until `play`
+    /// is called
+    ///
+    /// no effect if not playing
+    #[inline]
+    pub fn pause(&self)
+    {
+        self.sink.pause();
+    }
+
+    /// is this `Track` currently paused?
+    #[inline]
+    pub fn is_paused(&self) -> bool
+    {
+        self.sink.is_paused()
+    }
+
+    /// starts playback is paused, or pauses if playing
+    pub fn toggle_play(&self)
+    {
+        if self.is_paused()
+        {
+            self.play();
         }
-
-        use SampleType::*;
-
-        // actually write
-        match format
+        else
         {
-            F32 => write_samples!(to_f32, 4),
-            I16 => write_samples!(to_i16, 2),
-            U16 => write_samples!(to_u16, 2),
+            self.pause()
         }
     }
 
-    fn tune(&mut self, channels: usize, sample_rate: usize)
+    /// has this `Track` finished playing?
+    #[inline]
+    pub fn done(&self) -> bool
     {
-        Track::tune(self, channels, sample_rate);
+        self.sink.empty()
+    }
+
+    /// get the current volume of this `Track`, where
+    /// 1.0 is the default value
+    #[inline]
+    pub fn volume(&self) -> f32
+    {
+        self.sink.volume()
+    }
+    
+    /// set the current volume of this `Track`, where
+    /// 1.0 is the default value
+    #[inline]
+    pub fn set_volume(&self, value: f32)
+    {
+        self.sink.set_volume(value)
+    }
+
+    /// number of channels in this track(mono, stereo, etc.)
+    #[inline]
+    pub fn channel_count(&self) -> usize
+    {
+        self.channel_count
+    }
+
+    /// sample rate of this track
+    #[inline]
+    pub fn sample_rate(&self) -> usize
+    {
+        self.sample_rate
+    }
+
+    /// get the interleaved samples of this track
+    #[inline]
+    pub fn samples(&self) -> &[S]
+    {
+        &self.samples
+    }
+
+    /// iterate this `Track`'s frames, that is, go through
+    /// its samples that will play at the same time for the
+    /// duration of this track, but in different channels
+    pub fn iter_frames(&self) -> impl Iterator<Item = &[S]>
+    {
+        self.samples
+            .chunks_exact(self.channel_count)
+    }
+
+    /// how long this track lasts in total
+    pub fn duration(&self) -> Duration
+    {
+        let ms = self.samples.len() as u64 * 1000;
+        let div = (self.channel_count * self.sample_rate) as u64;
+        
+        Duration::from_millis(ms / div)
+    }
+}
+
+impl<S: Sample> Iterator for TrackSource<S>
+{
+    type Item = S;
+
+    fn next(&mut self) -> Option<S>
+    {
+        match self.samples.get(self.ind)
+        {
+            Some(&s) =>
+            {
+                self.ind += 1;
+                Some(s)
+            },
+            None => None
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>)
+    {
+        let len = self.samples.len() - self.ind;
+        
+        (len, Some(len))
+    }
+}
+
+impl<S: Sample> ExactSizeIterator for TrackSource<S> { }
+
+impl<S: Sample> rodio::Source for TrackSource<S>
+{
+    fn current_frame_len(&self) -> Option<usize>
+    {
+        None
+    }
+
+    fn channels(&self) -> u16
+    {
+        self.channel_count
+    }
+
+    fn sample_rate(&self) -> u32
+    {
+        self.sample_rate
+    }
+
+    fn total_duration(&self) -> Option<Duration>
+    {
+        let ms = self.len() as u64 * 1000 / (self.channel_count as u64 * self.sample_rate as u64);
+        Some(Duration::from_millis(ms))
     }
 }
