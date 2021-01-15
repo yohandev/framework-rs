@@ -8,8 +8,8 @@ use winit::event::Event;
 use rand::prelude::ThreadRng;
 
 use crate::input::{ Input, Mouse, Keys, Time, ProcessedEvent };
+use crate::draw::{ CanvasId, Window, Image };
 use crate::sound::{ Audio, Track, Sample };
-use crate::draw::{ CanvasId, Window };
 use crate::math::Extent2;
 use crate::Sketch;
 
@@ -197,6 +197,17 @@ impl App
     pub fn destroy_canvas(&mut self, id: CanvasId)
     {
         self.windows.remove(&id);
+    }
+
+    /// loads an `Image` at the specified path, converting its
+    /// pixels to `Rgba<u8>` by cloning if not already that
+    /// format. This method is shorthand for:
+    /// ```
+    /// Image::open(path).ok()
+    /// ```
+    pub fn load_image(&self, path: impl AsRef<Path>) -> Option<Image>
+    {
+        Image::open(path).ok()
     }
 
     /// loads a sound [Track] at the given path, if it exists.
