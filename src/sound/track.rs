@@ -12,14 +12,14 @@ pub struct Track<S: Sample>
     samples: Arc<[S]>,
     /// number of channels in this file
     channels: usize,
-    /// next index
-    index: usize,
+    /// sample rate of this file
+    sample_rate: usize,
 }
 
 impl<S: Sample> Track<S>
 {
     pub fn open()
     {
-        
+
     }
 }
