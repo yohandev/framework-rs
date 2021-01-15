@@ -3,7 +3,7 @@ mod barycentric;
 mod bresenham;
 mod triangle;
 
-pub use barycentric::Barycentric;
-pub use ref_counted::RefCounted;
-pub use bresenham::Bresenham;
-pub use triangle::Triangle;
+pub use self::barycentric::Barycentric;
+pub use self::ref_counted::RefCounted;
+pub use self::bresenham::Bresenham;
+pub use self::triangle::Triangle;

@@ -12,9 +12,10 @@ impl Sketch for Foo
 
         // load audio. the first app.audio() call
         // initializes audio subsystem
-        let song = app.audio().load("piano.ogg");
+        let song = app.load_sound("piano.ogg");
+        let img = app.load_image("trees.png");
 
-        Foo { song }
+        Foo { song, img }
     }
 
     // only called if a canvas exists. then, it is
@@ -23,45 +24,35 @@ impl Sketch for Foo
     // this method is implemented.
     fn draw(&mut self, c: &mut Canvas)
     {
-        // use macro...
-        background!(c, BLACK);
-        // ...or type it out manually:
         c.background(Rgba::BLACK);
 
-        // use macros...
-        stroke!(c, BLUE);
-        line!(c, [0, 0], [20, 40]);
-        // ...or type it out manually:
-        c.stroke(Rgba::BLUE);
-        c.line(Vec2::new(0, 0), Vec2::new(20, 40));
+        c.stroke(c!("blue"));
+        c.line(v![0, 0], v![20, 40]);
 
-        // other macros...
-        fill!(c, [0x23, 0xff, 0x12, 0xff]);
-        triangle!(c, [20, 50], [1, 2], [50, 80]);
-        ellipse!(c, [70, 70], [10, 99]);
+        c.fill(c![0x23, 0xff, 0x12, 0xff]);
+        c.triangle(v![20, 50], v![1, 2], v![50, 80]);
+        c.ellipse(v![70, 70], v![10, 99]);
+
+        c.image(&self.img, v![400, 200]);
     }
 
     // update the sketch state [and app]. called
     // on every main events clear event.
     fn update(&mut self, app: &mut App)
     {
-        app.time().dt();            // delta time
-        app.keys().pressed(Key::A); // pressed this frame?
-        app.keys().down(Key::B);    // pressed at all?
-        app.mouse().down(Mouse::R); // same deal as keys
-        app.mouse().x();            // position in pixels
+        app.time().dt();                // delta time
+        app.keys().pressed(btn!("a"));  // pressed this frame?
+        app.keys().down(btn!("b"));     // pressed at all?
+        app.mouse().down(btn!("rmb"));  // same deal as keys
+        app.mouse().x();                // position in pixels
 
         if app.keys().pressed(Key::Space)
         {
-            app.audio().play(&self.song);
-        }
-        else if app.keys().pressed(Key::Backspace)
-        {
-            app.audio().pause(&self.song);
-        }
-        else if app.keys().pressed(Key::P)
-        {
-            app.audio().resume(&self.song);
+            match self.song.is_playing()
+            {
+                false => song.play(),
+                true => song.pause(),
+            }
         }
     }
 

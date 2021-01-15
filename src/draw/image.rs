@@ -3,13 +3,13 @@ use image::{ GenericImageView, ImageError };
 use std::path::Path;
 
 use crate::math::Extent2;
-use crate::Bitmap;
+use crate::draw::Bitmap;
 
 /// represents an image, which does everything a [Bitmap]
 /// can
 ///
 /// [Bitmap]: crate::Bitmap
-pub type Image = Bitmap<Vec<u8>>;
+pub type Image = Bitmap<(), Vec<u8>>;
 
 impl Image
 {
@@ -17,10 +17,11 @@ impl Image
     /// if the format isn't Rgba<u8>
     pub fn open(path: impl AsRef<Path>) -> Result<Self, ImageError>
     {
-        image::open(path).map(|img| Self
+        image::open(path).map(|img|
         {
-            size: Extent2::new(img.width() as usize, img.height() as usize),
-            inner: img.into_rgba8().into_raw()
+            let size = Extent2::new(img.width(), img.height()).as_();
+
+            Bitmap::new((), img.into_rgba8().into_raw(), size)
         })
     }
 }

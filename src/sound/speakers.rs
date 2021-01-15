@@ -1,9 +1,10 @@
 use std::sync::mpsc::{ channel, Sender };
 
-use crate::sound::{ SampleType, silence, track };
+use crate::sound::sample::SampleType;
+use crate::sound::{ silence, track };
 
 /// output endpoint for audio
-pub struct Speakers
+pub struct Audio
 {
     /// internal cpal output stream
     _stream: cpal::Stream,
@@ -19,7 +20,7 @@ type DynTrack = Box<dyn track::RawTrack>;
 
 /// errors that could occur upon speakers creation
 #[derive(Debug)]
-pub enum SpeakersErr
+pub enum AudioErr
 {
     /// indicates that `cpal::Host::default_output_device`
     /// returned `None`
@@ -34,22 +35,22 @@ pub enum SpeakersErr
 
 use cpal::traits::*;
 
-impl Speakers
+impl Audio
 {
     /// connects a new `Speakers` instance to the device
     /// endpoint, and starts an output stream
     ///
     /// tldr; play some sound!
-    pub fn new() -> Result<Self, SpeakersErr>
+    pub fn new() -> Result<Self, AudioErr>
     {
         // cpal init
         let host = cpal::default_host();
         let devc = host
             .default_output_device()
-            .ok_or(SpeakersErr::NoOutputDevice)?;
+            .ok_or(AudioErr::NoOutputDevice)?;
         let conf = devc
             .default_output_config()
-            .map_err(|e| SpeakersErr::DefaultStreamConfigError(e))?;
+            .map_err(|e| AudioErr::DefaultStreamConfigError(e))?;
         let smpf = conf.sample_format();
         let smpt = smpf.into();
         let conf = cpal::StreamConfig::from(conf);
@@ -90,7 +91,7 @@ impl Speakers
                 silence::write_silence(stream, smpt);
             }
 
-        }, e_fn).map_err(|e| SpeakersErr::BuildStreamError(e))?;
+        }, e_fn).map_err(|e| AudioErr::BuildStreamError(e))?;
 
         Ok(Self { _stream, send, smpt })
     }

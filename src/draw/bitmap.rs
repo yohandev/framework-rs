@@ -6,22 +6,35 @@ use crate::math::*;
 
 /// represents a bitmap, which can be iterated and
 /// drawn to
-pub struct Bitmap<T: Buf>
+///
+/// the second generic argument `B` is the inner storage
+/// for pixels(raw [u8]) and `I` is this bitmap's ID, if
+/// any. that ID should be `Copy` to access it later
+#[derive(Debug, Default)]
+pub struct Bitmap<I, B: Buf>
 {
+    /// this bitmap's ID
+    id: I,
+
     /// inner byte array representing this bitmap
-    pub(crate) inner: T,
+    inner: B,
     /// width and height, in pixels, of this bitmap
-    pub(crate) size: Extent2<usize>,
+    size: Extent2<usize>,
+
+    /// current stroke colour, if any
+    pub stroke: Option<Rgba<u8>>,
+    /// current fill colour, if any
+    pub fill: Option<Rgba<u8>>,
 }
 
 /// restrictions for a type that can be used as a bitmap
 /// pixel buffer
 pub trait Buf: AsRef<[u8]> + AsMut<[u8]> { }
 
-impl<T: Buf> Bitmap<T>
+impl<I, B: Buf> Bitmap<I, B>
 {
     /// create a new bitmap from its raw parts
-    pub fn new(inner: T, size: impl Into<Extent2<usize>>) -> Self
+    pub fn new(id: I, inner: B, size: impl Into<Extent2<usize>>) -> Self
     {
         // convert
         let size = size.into();
@@ -29,7 +42,19 @@ impl<T: Buf> Bitmap<T>
         debug_assert_eq!(inner.as_ref().len() % 4, 0);
         debug_assert_eq!(inner.as_ref().len() / 4, size.w * size.h);
 
-        Self { inner, size }
+        // pen
+        let stroke = Some(Rgba::white());
+        let fill = Some(Rgba::grey(0x80));
+
+        Self { id, inner, size, stroke, fill }
+    }
+
+    /// get this bitmap' ID if it's used(otherwise
+    /// get returns an empty tuple)
+    #[inline]
+    pub fn id(&self) -> &I
+    {
+        &self.id
     }
 
     /// get this bitmap's width and height, in pixels
@@ -202,55 +227,51 @@ impl<T: Buf> Bitmap<T>
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
     }
 
-    /// draw a single pixel to this bitmap. panics if out of bounds
+    /// set the fill colour to be used for any future drawing calls.
+    /// this is a shorthand for `canvas.fill = Some(col)`
     #[inline]
-    pub fn set(&mut self, pos: Vec2<i32>, col: Rgba<u8>)
+    pub fn fill(&mut self, col: Rgba<u8>)
     {
-        // index
-        let ind = pos.y as usize * self.width() + pos.x as usize;
+        self.fill = Some(col);
+    }
 
-        // set
-        self.pixels_mut()[ind] = col;
+    /// set the stroke colour to be used for any future drawing calls
+    /// this is a shorthand for `canvas.stroke = Some(col)`
+    #[inline]
+    pub fn stroke(&mut self, col: Rgba<u8>)
+    {
+        self.stroke = Some(col);
+    }
+
+    /// any future drawing calls will have no fill colour.
+    /// this is a shorthand for `canvas.fill = None`
+    #[inline]
+    pub fn no_fill(&mut self)
+    {
+        self.fill = None;
+    }
+
+    /// any future drawing calls will have no stroke colour.
+    /// this is a shorthand for `canvas.stroke = None`
+    #[inline]
+    pub fn no_stroke(&mut self)
+    {
+        self.stroke = None;
     }
 
     /// fills this entire bitmap with a color. this is much more efficient
     /// than iterating through the pixels and individually setting their
     /// colors.
-    pub fn clear(&mut self, col: Rgba<u8>)
+    pub fn background(&mut self, col: Rgba<u8>)
     {
-        // get the buffer
-        let buf = self.pixels_mut();
-
-        // set the first pixel
-        buf[0] = col;
-
-        // size is how much has been done so far(also the cursor)
-        // rem is how much to be populated and may go below zero
-        let mut siz = 1;
-        let mut rem = buf.len() as isize;
-
-        while rem > 0
-        {
-            // split what's already been cleared and what's remaining
-            let (src, dst) = buf.split_at_mut(siz);
-
-            // upper-bound index to copy
-            let cpy = dst.len().min(siz);
-
-            // copy over to clear some more
-            dst[0..cpy].copy_from_slice(&src[0..cpy]);
-
-            // grow by a factor of 2
-            rem -= siz as isize;
-            siz *= 2;
-        }
+        incremental_fill(self.pixels_mut(), col);
     }
 
     /// paste another bitmap on top of this one, clipping any invisible
     /// pixels and (optionally) translating it
     ///
     /// the source bitmap isn't affected
-    pub fn paste(&mut self, pos: Vec2<i32>, src: &Bitmap<impl Buf>)
+    pub fn image<U>(&mut self, src: &Bitmap<U, impl Buf>, pos: Vec2<i32>)
     {
         // givens
         let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
@@ -286,12 +307,110 @@ impl<T: Buf> Bitmap<T>
             dst_buf[dst_str..dst_end].copy_from_slice(&src_buf[src_str..src_end]);
         }
     }
+
+    /// draws a line from `a` to `b`, clipping any pixels out of
+    /// bounds
+    pub fn line(&mut self, a: Vec2<i32>, b: Vec2<i32>)
+    {
+        use crate::util::Bresenham;
+
+        // stroke
+        if let Some(stroke) = self.stroke
+        {
+            for pos in Bresenham::new_bounded(a, b, self.size().as_())
+            {
+                self[pos] = stroke;
+            }
+        }
+    }
+
+    /// draws a triangle with vertices `a`, `b`, and `c`, clipping
+    /// any pixels out of bounds
+    pub fn triangle(&mut self, a: Vec2<i32>, b: Vec2<i32>, c: Vec2<i32>)
+    {
+        use crate::util::Triangle;
+
+        // fill
+        if let Some(fill) = self.fill
+        {
+            for (pos, _) in Triangle::new_bounded([a, b, c], self.size().as_())
+            {
+                self[pos] = fill;
+            }
+        }
+
+        // stroke
+        self.line(a, b);
+        self.line(b, c);
+        self.line(c, a);
+    }
+
+    /// draws a rectangle with top-left corner at `pos` and of
+    /// (width, height) `siz`. clips any pixels out of bounds.
+    pub fn rect(&mut self, pos: Vec2<i32>, siz: Vec2<i32>)
+    {
+        // size of this bitmap
+        let bounds: Vec2<i32> = self.size.as_().into();
+
+        // crop with top left corner(0, 0)
+        let siz = siz.map2(pos, |s, p| if p < 0 { s + p } else { s });
+        let pos = pos.map(|n| n.max(0));
+        // crop with bottom right corner(width - 1, height - 1)
+        let siz = siz.map3(pos, bounds, |siz, pos, bound|
+        {
+            let d = bound - (pos + siz);
+            if d < 0 { siz + d } else { siz }
+        });
+        
+        // empty rectangle
+        if siz.x <= 0 || siz.y <= 0
+        {
+            return;
+        }
+
+        // fill
+        if let Some(fill) = self.fill
+        {
+            // first line indices
+            let first_ln_i = (pos.y * bounds.x + pos.x) as usize;
+            let offset = first_ln_i + siz.x as usize;
+
+            // split
+            let (src, dst) = self.pixels_mut().split_at_mut(offset);
+
+            // draw first line
+            let src = &mut src[first_ln_i..];
+            incremental_fill(src, fill);
+
+            // draw other lines by copying first line
+            for y in pos.y + 1..pos.y + siz.y
+            {
+                let i = (y * bounds.x + pos.x) as usize - offset;
+                let j = i + siz.x as usize;
+
+                dst[i..j].copy_from_slice(src);
+            }
+        }
+        // stroke
+        if self.stroke.is_some()
+        {
+            let top_l = pos;
+            let btm_l = pos + Vec2::new(0, siz.y);
+            let top_r = pos + Vec2::new(siz.x, 0);
+            let btm_r = pos + siz;
+
+            self.line(top_l, top_r);
+            self.line(btm_l, btm_r);
+            self.line(top_l, btm_l);
+            self.line(top_r, btm_r);
+        }
+    }
 }
 
 /// blanket implementation
-impl<T: AsRef<[u8]> + AsMut<[u8]>> Buf for T { }
+impl<B: AsRef<[u8]> + AsMut<[u8]>> Buf for B { }
 
-impl<T: Buf> Index<Vec2<i32>> for Bitmap<T>
+impl<I, B: Buf> Index<Vec2<i32>> for Bitmap<I, B>
 {
     type Output = Rgba<u8>;
 
@@ -308,7 +427,7 @@ impl<T: Buf> Index<Vec2<i32>> for Bitmap<T>
     }
 }
 
-impl<T: Buf> IndexMut<Vec2<i32>> for Bitmap<T>
+impl<I, B: Buf> IndexMut<Vec2<i32>> for Bitmap<I,B>
 {
     /// get the pixel color at the given position in pixels. panics if
     /// out of bound
@@ -323,40 +442,35 @@ impl<T: Buf> IndexMut<Vec2<i32>> for Bitmap<T>
     }
 }
 
-impl<T: Buf> Index<Vec2<f32>> for Bitmap<T>
+/// incrementally fill a slice `buf` with `ele`
+/// using a progressively larger memcpy...
+/// 
+/// works setting buf[0], then copying that to
+/// buf[0..2], then copying buf[0..2] to buf[2..4],
+/// then buf[0..4] to buf[4..8], etc.
+fn incremental_fill<T: Copy>(buf: &mut [T], ele: T)
 {
-    type Output = Rgba<u8>;
+    // set the first element
+    buf[0] = ele;
 
-    /// get the pixel color at the given position in percentage. 
-    /// the input must be within the `0.0..=1.0` range, panics if
-    /// out of bound
-    #[inline]
-    fn index(&self, pos: Vec2<f32>) -> &Self::Output
+    // size is how much has been done so far(also the cursor)
+    // rem is how much to be populated and may go below zero
+    let mut siz = 1;
+    let mut rem = buf.len() as isize;
+
+    while rem > 0
     {
-        // index
-        let x = pos.x * (self.width() - 1) as f32;
-        let y = pos.y * (self.height() - 1) as f32;
-        let ind = y as usize * self.width() + x as usize;
+        // split what's already been cleared and what's remaining
+        let (src, dst) = buf.split_at_mut(siz);
 
-        // get
-        &self.pixels()[ind]
-    }
-}
+        // upper-bound index to copy
+        let cpy = dst.len().min(siz);
 
-impl<T: Buf> IndexMut<Vec2<f32>> for Bitmap<T>
-{
-    /// get the pixel color at the given position in percentage. 
-    /// the input must be within the `0.0..=1.0` range, panics if
-    /// out of bound
-    #[inline]
-    fn index_mut(&mut self, pos: Vec2<f32>) -> &mut Self::Output
-    {
-        // index
-        let x = pos.x * (self.width() - 1) as f32;
-        let y = pos.y * (self.height() - 1) as f32;
-        let ind = y as usize * self.width() + x as usize;
+        // copy over to clear some more
+        dst[0..cpy].copy_from_slice(&src[0..cpy]);
 
-        // get
-        &mut self.pixels_mut()[ind]
+        // grow by a factor of 2
+        rem -= siz as isize;
+        siz *= 2;
     }
 }
