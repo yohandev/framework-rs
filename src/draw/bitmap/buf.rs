@@ -1,3 +1,5 @@
+use crate::math::Rgba;
+
 /// type that can be used as a bitmap pixel buffer
 ///
 /// while the entire buffer doesn't have to be in
@@ -13,17 +15,61 @@ pub unsafe trait PixelBuf
     /// | D, E, F |
     /// ⎣ G, H, I ⎦
     /// ```
-    /// ...`get_col(0)` would return `[A, B, C]`, while
-    /// `get_col(3)` would panic.
+    /// ...`raw_row(0)` would return `[A, B, C]`, while
+    /// `raw_row(3)` would panic. (in `u8` representations
+    /// of course)
+    ///
+    /// the `PixelBuf` implementor isn't expected to keep
+    /// track of its own size, so the promised `width` of
+    /// the bitmap is passed in this method. note that `width`
+    /// is in pixels(`Rgba<u8>`), NOT `u8`s.
     ///
     /// safety:
-    /// 1. should panic if `row` is out of bounds
+    /// 1. should panic if `col` is out of bounds
     /// 2. the slice returned should always be of constant
-    ///    length no matter what value `row` is, assuming
-    ///    condition (1) isn't violated.
+    ///    length equal to `width`, no matter what value
+    ///    `col` is and assuming condition (1) isn't violated.
     /// 3. the slice returned must be safely transmutable
     ///    to `Rgba<u8>`
-    fn get_col_raw<'a>(&self) -> &'a [u8];
+    fn raw_row<'a>(&self, col: usize, width: usize) -> &'a [u8];
+
+    /// get the pixels at the given column. panics if `col`
+    /// is out of bounds
+    ///
+    /// the `PixelBuf` implementor isn't expected to keep
+    /// track of its own size, so the promised `width` of
+    /// the bitmap is passed in this method.
+    fn row<'a>(&self, col: usize, width: usize) -> &'a [Rgba<u8>]
+    {
+        use std::slice::from_raw_parts as slice;
+        unsafe
+        {
+            slice(self.raw_row(col, width).as_ptr() as *const Rgba<u8>, width)
+        }
+    }
+}
+
+/// mutable version of [PixelBuf]
+///
+/// [PixelBuf]: self::PixelBuf
+pub unsafe trait PixelBufMut: PixelBuf
+{
+    /// mutable version of [PixelBuf::raw_row]
+    ///
+    /// [PixelBuf::raw_row]: self::PixelBuf::raw_row
+    fn raw_row_mut<'a>(&mut self, col: usize, width: usize) -> &'a mut [u8];
+
+    /// mutable version of [PixelBuf::row]
+    ///
+    /// [PixelBuf::row]: self::PixelBuf::row
+    fn row_mut<'a>(&mut self, col: usize, width: usize) -> &'a [Rgba<u8>]
+    {
+        use std::slice::from_raw_parts_mut as slice;
+        unsafe
+        {
+            slice(self.raw_row_mut(col, width).as_ptr() as *mut Rgba<u8>, width)
+        }
+    }
 }
 
 /// a promise trait over [PixelBuf] that ensures the
