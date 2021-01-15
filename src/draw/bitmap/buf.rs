@@ -34,7 +34,7 @@ pub unsafe trait PixelBuf
     ///    `col` is and assuming condition (1) isn't violated.
     /// 3. the slice returned must be safely transmutable
     ///    to `Rgba<u8>`
-    fn raw_row<'a>(&self, col: usize, width: usize) -> &'a [u8];
+    fn raw_row<'a>(&'a self, col: usize, width: usize) -> &'a [u8];
 
     /// get the pixels at the given column. panics if `col`
     /// is out of bounds
@@ -42,7 +42,8 @@ pub unsafe trait PixelBuf
     /// the `PixelBuf` implementor isn't expected to keep
     /// track of its own size, so the promised `width` of
     /// the bitmap is passed in this method.
-    fn row<'a>(&self, col: usize, width: usize) -> &'a [Rgba<u8>]
+    #[inline]
+    fn row<'a>(&'a self, col: usize, width: usize) -> &'a [Rgba<u8>]
     {
         use std::slice::from_raw_parts as slice;
         unsafe
@@ -60,12 +61,13 @@ pub unsafe trait PixelBufMut: PixelBuf
     /// mutable version of [PixelBuf::raw_row]
     ///
     /// [PixelBuf::raw_row]: self::PixelBuf::raw_row
-    fn raw_row_mut<'a>(&mut self, col: usize, width: usize) -> &'a mut [u8];
+    fn raw_row_mut<'a>(&'a mut self, col: usize, width: usize) -> &'a mut [u8];
 
     /// mutable version of [PixelBuf::row]
     ///
     /// [PixelBuf::row]: self::PixelBuf::row
-    fn row_mut<'a>(&mut self, col: usize, width: usize) -> &'a [Rgba<u8>]
+    #[inline]
+    fn row_mut<'a>(&'a mut self, col: usize, width: usize) -> &'a [Rgba<u8>]
     {
         use std::slice::from_raw_parts_mut as slice;
         unsafe
@@ -85,10 +87,11 @@ pub unsafe trait FlatPixelBuf: PixelBuf
 {
     /// get the pixels in `u8` representation, aligned in
     /// memory row-by-row
-    fn raw_pixels<'a>(&self) -> &'a [u8];
+    fn raw_pixels<'a>(&'a self) -> &'a [u8];
 
     /// get the pixels aligned in memory row-by-row
-    fn pixels<'a>(&self) -> &'a [Rgba<u8>]
+    #[inline]
+    fn pixels<'a>(&'a self) -> &'a [Rgba<u8>]
     {
         use std::slice::from_raw_parts as slice;
 
@@ -107,10 +110,11 @@ pub unsafe trait FlatPixelBufMut: FlatPixelBuf
 {
     /// get the pixels in `u8` representation, aligned in
     /// memory row-by-row
-    fn raw_pixels_mut<'a>(&mut self) -> &'a mut [u8];
+    fn raw_pixels_mut<'a>(&'a mut self) -> &'a mut [u8];
 
     /// get the pixels aligned in memory row-by-row
-    fn pixels_mut<'a>(&mut self) -> &'a mut [Rgba<u8>]
+    #[inline]
+    fn pixels_mut<'a>(&'a mut self) -> &'a mut [Rgba<u8>]
     {
         use std::slice::from_raw_parts_mut as slice;
 
@@ -119,5 +123,45 @@ pub unsafe trait FlatPixelBufMut: FlatPixelBuf
         {
             slice(buf.as_ptr() as *mut Rgba<u8>, buf.len() >> 2)
         }
+    }
+}
+
+unsafe impl<T: AsRef<[u8]>> PixelBuf for T
+{
+    #[inline]
+    fn raw_row<'a>(&'a self, col: usize, width: usize) -> &'a [u8]
+    {
+        let i = col * width;
+
+        &self.as_ref()[i..i + width]
+    }
+}
+
+unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> PixelBufMut for T
+{
+    #[inline]
+    fn raw_row_mut<'a>(&'a mut self, col: usize, width: usize) -> &'a mut [u8]
+    {
+        let i = col * width;
+
+        &mut self.as_mut()[i..i + width]
+    }
+}
+
+unsafe impl<T: AsRef<[u8]>> FlatPixelBuf for T
+{
+    #[inline]
+    fn raw_pixels<'a>(&'a self) -> &'a [u8]
+    {
+        self.as_ref()
+    }
+}
+
+unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> FlatPixelBufMut for T
+{
+    #[inline]
+    fn raw_pixels_mut<'a>(&'a mut self) -> &'a mut [u8]
+    {
+        self.as_mut()
     }
 }
