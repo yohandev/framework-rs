@@ -217,7 +217,7 @@ impl App
         let size = size.into();
         let area = size.w * size.h;
 
-        Image::new((), vec![Default::default(); area], size)
+        Image::new((), vec![0; area * 4], size)
     }
 
     /// loads a sound [Track] at the given path, if it exists.
