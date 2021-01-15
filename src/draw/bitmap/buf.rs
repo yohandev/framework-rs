@@ -81,7 +81,7 @@ pub unsafe trait PixelBufMut: PixelBuf
 /// right before row 2 which is right before row 3, etc.
 ///
 /// [PixelBuf]: self::PixelBuf
-pub unsafe trait ContiguousPixelBuf: PixelBuf
+pub unsafe trait FlatPixelBuf: PixelBuf
 {
     /// get the pixels in `u8` representation, aligned in
     /// memory row-by-row
@@ -100,10 +100,10 @@ pub unsafe trait ContiguousPixelBuf: PixelBuf
     }
 }
 
-/// mutable version of [ContiguousPixelBuf]
+/// mutable version of [FlatPixelBuf]
 ///
-/// [ContiguousPixelBuf]: self::ContiguousPixelBuf
-pub unsafe trait ContiguousPixelBufMut: ContiguousPixelBuf
+/// [FlatPixelBuf]: self::FlatPixelBuf
+pub unsafe trait FlatPixelBufMut: FlatPixelBuf
 {
     /// get the pixels in `u8` representation, aligned in
     /// memory row-by-row
