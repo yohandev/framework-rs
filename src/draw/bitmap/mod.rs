@@ -294,8 +294,8 @@ impl<I, B: Buf> Bitmap<I, B>
         let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
         let src_size: Vec2<i32> = src.size().as_::<i32>().into();
 
-        let src_buf = src.raw_pixels();
-        let dst_buf = self.raw_pixels_mut();
+        let src_buf = src.pixels();
+        let dst_buf = self.pixels_mut();
 
         // as you iterate src's pixels; [0, src_width] and [0, src_height]
         let src_min = pos.map2(src_size, |p, s| (if p < 0 { -p } else { 0 }).min(s));
@@ -314,11 +314,11 @@ impl<I, B: Buf> Bitmap<I, B>
         // iterate vertically
         for y in src_min.y..src_max.y
         {
-            let src_str = ((y * src_size.x * 4) + (src_min.x * 4)) as usize;
-            let src_end = ((y * src_size.x * 4) + (src_max.x * 4)) as usize;
+            let src_str = (y * src_size.x + src_min.x) as usize;
+            let src_end = (y * src_size.x + src_max.x) as usize;
 
-            let dst_str = (((y + pos.y) * dst_size.x * 4) + (dst_min_x * 4)) as usize;
-            let dst_end = (((y + pos.y) * dst_size.x * 4) + (dst_max_x * 4)) as usize;
+            let dst_str = ((y + pos.y) * dst_size.x + dst_min_x) as usize;
+            let dst_end = ((y + pos.y) * dst_size.x + dst_max_x) as usize;
 
             // copy entire horizontal segments at once
             dst_buf[dst_str..dst_end].copy_from_slice(&src_buf[src_str..src_end]);
