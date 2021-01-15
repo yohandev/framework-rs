@@ -207,9 +207,9 @@ impl App
     /// - alac(".caf")
     ///
     /// [Track]: crate::audio::Track
-    pub fn load_sound<S: Sample>(&self, path: impl AsRef<Path>) -> Track<S>
+    pub fn load_sound<S: Sample>(&self, path: impl AsRef<Path>) -> Option<Track<S>>
     {
-        Track::open(path, &self.audio).unwrap()
+        Track::open(path, &self.audio).ok()
     }
 
     /// get this app's random number generator

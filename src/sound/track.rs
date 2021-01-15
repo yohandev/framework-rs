@@ -14,6 +14,7 @@ use super::Audio;
 /// - alac(".caf")
 pub struct Track<S: Sample>
 {
+    /// sink to control playback
     sink: rodio::Sink,
 
     /// this audio file's interleaved samples
@@ -82,6 +83,7 @@ impl<S: Sample> Track<S>
     /// start playing or resume playback of this track
     ///
     /// no effect if not paused
+    #[inline]
     pub fn play(&self)
     {
         self.sink.play();
@@ -91,21 +93,92 @@ impl<S: Sample> Track<S>
     /// is called
     ///
     /// no effect if not playing
+    #[inline]
     pub fn pause(&self)
     {
         self.sink.pause();
     }
 
     /// is this `Track` currently paused?
+    #[inline]
     pub fn is_paused(&self) -> bool
     {
         self.sink.is_paused()
     }
 
+    /// starts playback is paused, or pauses if playing
+    pub fn toggle_play(&self)
+    {
+        if self.is_paused()
+        {
+            self.play();
+        }
+        else
+        {
+            self.pause()
+        }
+    }
+
     /// has this `Track` finished playing?
+    #[inline]
     pub fn done(&self) -> bool
     {
         self.sink.empty()
+    }
+
+    /// get the current volume of this `Track`, where
+    /// 1.0 is the default value
+    #[inline]
+    pub fn volume(&self) -> f32
+    {
+        self.sink.volume()
+    }
+    
+    /// set the current volume of this `Track`, where
+    /// 1.0 is the default value
+    #[inline]
+    pub fn set_volume(&self, value: f32)
+    {
+        self.sink.set_volume(value)
+    }
+
+    /// number of channels in this track(mono, stereo, etc.)
+    #[inline]
+    pub fn channel_count(&self) -> usize
+    {
+        self.channel_count
+    }
+
+    /// sample rate of this track
+    #[inline]
+    pub fn sample_rate(&self) -> usize
+    {
+        self.sample_rate
+    }
+
+    /// get the interleaved samples of this track
+    #[inline]
+    pub fn samples(&self) -> &[S]
+    {
+        &self.samples
+    }
+
+    /// iterate this `Track`'s frames, that is, go through
+    /// its samples that will play at the same time for the
+    /// duration of this track, but in different channels
+    pub fn iter_frames(&self) -> impl Iterator<Item = &[S]>
+    {
+        self.samples
+            .chunks_exact(self.channel_count)
+    }
+
+    /// how long this track lasts in total
+    pub fn duration(&self) -> Duration
+    {
+        let ms = self.samples.len() as u64 * 1000;
+        let div = (self.channel_count * self.sample_rate) as u64;
+        
+        Duration::from_millis(ms / div)
     }
 }
 

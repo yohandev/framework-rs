@@ -13,7 +13,9 @@ impl Sketch for Foo
     {
         app.create_canvas("piano!", (300, 200));
 
-        let song = app.load_sound("examples/res/piano.ogg");
+        let song = app
+            .load_sound("examples/res/piano.ogg")
+            .unwrap();
 
         Self(song)
     }
@@ -22,8 +24,7 @@ impl Sketch for Foo
     {
         if app.keys().pressed(btn!(" "))
         {
-            if self.0.is_paused() { self.0.play(); }
-            else { self.0.pause(); }
+            self.0.toggle_play();
         }
     }
 }
