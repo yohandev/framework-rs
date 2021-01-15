@@ -210,6 +210,16 @@ impl App
         Image::open(path).ok()
     }
 
+    /// create a new empty image from a given size. this is a
+    /// utility method over `Image::new()`
+    pub fn create_image(&self, size: impl Into<Extent2<usize>>) -> Image
+    {
+        let size = size.into();
+        let area = size.w * size.h;
+
+        Image::new((), vec![Default::default(); area], size)
+    }
+
     /// loads a sound [Track] at the given path, if it exists.
     /// supports formats with extensions:
     /// - flac(".flac")
