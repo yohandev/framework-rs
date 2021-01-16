@@ -312,6 +312,43 @@ impl<I, B: PixelBufMut> Bitmap<I, B>
             }
         }
     }
+
+    /// draws a line from `a` to `b`, clipping any pixels out of
+    /// bounds
+    pub fn line(&mut self, a: Vec2<i32>, b: Vec2<i32>)
+    {
+        use crate::util::Bresenham;
+
+        // stroke
+        if let Some(stroke) = self.stroke
+        {
+            for pos in Bresenham::new_bounded(a, b, self.size().as_())
+            {
+                self[pos] = stroke;
+            }
+        }
+    }
+
+    /// draws a triangle with vertices `a`, `b`, and `c`, clipping
+    /// any pixels out of bounds
+    pub fn triangle(&mut self, a: Vec2<i32>, b: Vec2<i32>, c: Vec2<i32>)
+    {
+        use crate::util::Triangle;
+
+        // fill
+        if let Some(fill) = self.fill
+        {
+            for (pos, _) in Triangle::new_bounded([a, b, c], self.size().as_())
+            {
+                self[pos] = fill;
+            }
+        }
+
+        // stroke
+        self.line(a, b);
+        self.line(b, c);
+        self.line(c, a);
+    }
 }
 
 // // incrementally fill a slice `buf` with `ele`
