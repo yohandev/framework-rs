@@ -1,7 +1,7 @@
 use rayon::prelude::*;
 
 use crate::draw::{ Bitmap, PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
-use crate::math::{ Vec2, Rgba };
+use crate::math::{ Vec2, Rgba, Extent2 };
 
 impl<I, B: PixelBuf> Bitmap<I, B>
 {
@@ -116,3 +116,60 @@ impl<I, B: FlatPixelBufMut> Bitmap<I, B>
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
     }
 }
+
+impl<I, B: PixelBuf> Bitmap<I, B>
+{
+    /// iterate non-overlapping "sub-bitmaps" or "chunks" in this bitmap,
+    /// of size `size`. the remaining pixels, if any, are discarded from
+    /// the iterator.
+    ///
+    /// this iterates over `Bitmap<Vec2<i32>, _>`, where each bitmap's `id()`
+    /// is the position of its top-left corner in pixel-space.
+    ///
+    /// this method is comparable to a 2D version of [ChunksExact]
+    ///
+    /// [ChunksExact]: std::slice::ChunksExact
+    pub fn iter_pixel_chunks(&self, size: Extent2<usize>) -> impl Iterator<Item = Bitmap<Vec2<i32>, Chunk<'_>>>
+    {
+        // iterate in row-by-row zig-zag pattern
+        (0..self.height() / size.h)
+        // do the cartesian product
+        .flat_map(move |y| (0..self.width() / size.w).map(move |x| (x, y)))
+        // once we have zig-zag indices, begin dividing chunks:
+        .map(move |(x, y)|
+        {
+            // (x, y) is chunk index; remap to top-left corner in pixel
+            // space
+            let pos = Vec2::new(x * size.w, y * size.h);
+
+            // create sparse 2D buffer(see `Chunks::buf` doc)
+            let buf = (pos.y..pos.y + size.h)
+                // go through each row in chunk
+                .map(|y| &self.buf.row(y, self.width())[pos.x..pos.x + size.w])
+                // collect to box(no other choice, chunk isn't contiguous)
+                .collect::<Box<_>>();
+            
+            // convert pos
+            let pos = pos.as_();
+            
+            // return chunks
+            Bitmap::new(pos, Chunk(buf), size)
+        })
+    }
+}
+
+/// a single chunk in [Bitmap::iter_pixel_chunks]
+///
+/// `self.0`:
+/// outer-most array is columns, where
+/// each element is a reference to a
+/// row
+/// ```text
+/// buf: Box -> [&A, &B, &C]
+///     &A -> [(0, 0), (1, 0), (2, 0)]
+///     &B -> [(0, 1), (1, 1), (2, 1)]
+///     &C -> [(0, 2), (1, 2), (2, 2)]
+/// where &A, &B, and &C are assumed to be
+/// in non-contiguous memory
+/// ```
+pub struct Chunk<'a>(Box<[&'a [Rgba<u8>]]>);
