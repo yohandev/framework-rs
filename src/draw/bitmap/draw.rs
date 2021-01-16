@@ -188,7 +188,7 @@ impl<I, B: PixelBufMut> Bitmap<I, B>
             let src_buf = &src_buf[src_min.x..src_max.x];
 
             // get the destination image's row
-            let dst_buf = self.buf.row_mut(y, self.width());
+            let dst_buf = self.buf.row_mut(y + pos.y as usize, self.width());
             // take only the columns we care about
             let dst_buf = &mut dst_buf[dst_min_x..dst_max_x];
 
