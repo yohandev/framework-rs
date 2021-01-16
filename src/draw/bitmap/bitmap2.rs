@@ -5,8 +5,6 @@ use rayon::prelude::*;
 use crate::draw::{ PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
 use crate::math::{ Vec2, Rgba, Extent2 };
 
-use super::incremental_fill;
-
 /// represents a bitmap, which can be iterated and
 /// drawn to
 ///

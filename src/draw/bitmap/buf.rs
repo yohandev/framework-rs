@@ -162,9 +162,10 @@ unsafe impl<T: AsRef<[u8]>> PixelBuf for T
     #[inline]
     fn raw_row<'a>(&'a self, col: usize, width: usize) -> &'a [u8]
     {
-        let i = col * width;
+        let j = width * 4;
+        let i = col * j;
 
-        &self.as_ref()[i..i + width]
+        &self.as_ref()[i..i +j]
     }
 
     #[inline]
@@ -179,9 +180,10 @@ unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> PixelBufMut for T
     #[inline]
     fn raw_row_mut<'a>(&'a mut self, col: usize, width: usize) -> &'a mut [u8]
     {
-        let i = col * width;
+        let j = width * 4;
+        let i = col * j;
 
-        &mut self.as_mut()[i..i + width]
+        &mut self.as_mut()[i..i + j]
     }
 
     #[inline]
