@@ -34,6 +34,9 @@ pub unsafe trait PixelBuf
     ///    `col` is and assuming condition (1) isn't violated.
     /// 3. the slice returned must be safely transmutable
     ///    to `Rgba<u8>`
+    /// 4. calling `raw_row` or `row` for any two different values
+    ///    `col` should *never* return a slice that points to the
+    ///    same memory!
     fn raw_row<'a>(&'a self, col: usize, width: usize) -> &'a [u8];
 
     /// get the pixels at the given column. panics if `col`
@@ -67,7 +70,7 @@ pub unsafe trait PixelBufMut: PixelBuf
     ///
     /// [PixelBuf::row]: self::PixelBuf::row
     #[inline]
-    fn row_mut<'a>(&'a mut self, col: usize, width: usize) -> &'a [Rgba<u8>]
+    fn row_mut<'a>(&'a mut self, col: usize, width: usize) -> &'a mut [Rgba<u8>]
     {
         use std::slice::from_raw_parts_mut as slice;
         unsafe

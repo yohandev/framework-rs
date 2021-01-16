@@ -1,6 +1,8 @@
+mod bitmap2;
 mod chunk;
 mod buf;
 
+pub use self::buf::{ PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
 pub use self::chunk::Chunk;
 
 use std::ops::{ Index, IndexMut };
