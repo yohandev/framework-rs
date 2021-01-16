@@ -54,6 +54,22 @@ pub unsafe trait PixelBuf
             slice(self.raw_row(col, width).as_ptr() as *const Rgba<u8>, width)
         }
     }
+
+    /// get the pixels in `u8` representation, aligned in
+    /// memory row-by-row(if possible)
+    fn try_raw_pixels<'a>(&'a self) -> Option<&'a [u8]>;
+
+    /// get the pixels aligned in memory row-by-row(if possible)
+    #[inline]
+    fn try_pixels<'a>(&'a self) -> Option<&'a [Rgba<u8>]>
+    {
+        use std::slice::from_raw_parts as slice;
+
+        self.try_raw_pixels().map(|buf| unsafe
+        {
+            slice(buf.as_ptr() as *const Rgba<u8>, buf.len() >> 2)
+        })
+    }
 }
 
 /// mutable version of [PixelBuf]
@@ -78,6 +94,22 @@ pub unsafe trait PixelBufMut: PixelBuf
             slice(self.raw_row_mut(col, width).as_ptr() as *mut Rgba<u8>, width)
         }
     }
+
+    /// get the pixels in `u8` representation, aligned in
+    /// memory row-by-row(if possible)
+    fn try_raw_pixels_mut<'a>(&'a mut self) -> Option<&'a mut [u8]>;
+
+    /// get the pixels aligned in memory row-by-row(if possible)
+    #[inline]
+    fn try_pixels_mut<'a>(&'a mut self) -> Option<&'a mut [Rgba<u8>]>
+    {
+        use std::slice::from_raw_parts_mut as slice;
+
+        self.try_raw_pixels_mut().map(|buf| unsafe
+        {
+            slice(buf.as_ptr() as *mut Rgba<u8>, buf.len() >> 2)
+        })
+    }
 }
 
 /// a promise trait over [PixelBuf] that ensures the
@@ -90,42 +122,38 @@ pub unsafe trait FlatPixelBuf: PixelBuf
 {
     /// get the pixels in `u8` representation, aligned in
     /// memory row-by-row
-    fn raw_pixels<'a>(&'a self) -> &'a [u8];
+    #[inline]
+    fn raw_pixels<'a>(&'a self) -> &'a [u8]
+    {
+        self.try_raw_pixels().unwrap()
+    }
 
     /// get the pixels aligned in memory row-by-row
     #[inline]
     fn pixels<'a>(&'a self) -> &'a [Rgba<u8>]
     {
-        use std::slice::from_raw_parts as slice;
-
-        let buf = self.raw_pixels();
-        unsafe
-        {
-            slice(buf.as_ptr() as *const Rgba<u8>, buf.len() >> 2)
-        }
+        self.try_pixels().unwrap()
     }
 }
 
 /// mutable version of [FlatPixelBuf]
 ///
 /// [FlatPixelBuf]: self::FlatPixelBuf
-pub unsafe trait FlatPixelBufMut: FlatPixelBuf
+pub unsafe trait FlatPixelBufMut: FlatPixelBuf + PixelBufMut
 {
     /// get the pixels in `u8` representation, aligned in
     /// memory row-by-row
-    fn raw_pixels_mut<'a>(&'a mut self) -> &'a mut [u8];
+    #[inline]
+    fn raw_pixels_mut<'a>(&'a mut self) -> &'a mut [u8]
+    {
+        self.try_raw_pixels_mut().unwrap()
+    }
 
     /// get the pixels aligned in memory row-by-row
     #[inline]
     fn pixels_mut<'a>(&'a mut self) -> &'a mut [Rgba<u8>]
     {
-        use std::slice::from_raw_parts_mut as slice;
-
-        let buf = self.raw_pixels_mut();
-        unsafe
-        {
-            slice(buf.as_ptr() as *mut Rgba<u8>, buf.len() >> 2)
-        }
+        self.try_pixels_mut().unwrap()
     }
 }
 
@@ -138,6 +166,12 @@ unsafe impl<T: AsRef<[u8]>> PixelBuf for T
 
         &self.as_ref()[i..i + width]
     }
+
+    #[inline]
+    fn try_raw_pixels<'a>(&'a self) -> Option<&'a [u8]>
+    {
+        Some(self.as_ref())
+    }
 }
 
 unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> PixelBufMut for T
@@ -149,22 +183,14 @@ unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> PixelBufMut for T
 
         &mut self.as_mut()[i..i + width]
     }
-}
 
-unsafe impl<T: AsRef<[u8]>> FlatPixelBuf for T
-{
     #[inline]
-    fn raw_pixels<'a>(&'a self) -> &'a [u8]
+    fn try_raw_pixels_mut<'a>(&'a mut self) -> Option<&'a mut [u8]>
     {
-        self.as_ref()
+        Some(self.as_mut())
     }
 }
 
-unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> FlatPixelBufMut for T
-{
-    #[inline]
-    fn raw_pixels_mut<'a>(&'a mut self) -> &'a mut [u8]
-    {
-        self.as_mut()
-    }
-}
+unsafe impl<T: AsRef<[u8]>> FlatPixelBuf for T { }
+
+unsafe impl<T: AsRef<[u8]> + AsMut<[u8]>> FlatPixelBufMut for T { }
