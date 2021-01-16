@@ -422,6 +422,52 @@ impl<I, B: PixelBufMut> Bitmap<I, B>
             self.line(top_r, btm_r);
         }
     }
+
+    /// paste another bitmap on top of this one, clipping any invisible
+    /// pixels and (optionally) translating it
+    ///
+    /// the source bitmap isn't affected
+    pub fn image<J>(&mut self, src: &Bitmap<J, impl PixelBuf>, pos: Vec2<i32>)
+    {
+        // givens
+        let dst_size: Vec2<i32> = self.size().as_::<i32>().into();
+        let src_size: Vec2<i32> = src.size().as_::<i32>().into();
+
+        // as you iterate src's pixels; [0, src_width] and [0, src_height]
+        let src_min = pos.map2(src_size, |p, s| (if p < 0 { -p } else { 0 }).min(s));
+        let src_max = pos.map3(src_size, dst_size, |p, ss, ds| if p + ss > ds { ds - p } else { ss });
+  
+        // as you copy to dst's pixels; [0, dst_width] and [0, dst_height]
+        let dst_min_x = if pos.x < 0 { 0 } else { pos.x } as usize;
+        let dst_max_x = dst_min_x + (src_max.x - src_min.x) as usize;
+
+        // nothing to copy
+        if dst_max_x < dst_min_x
+        {
+            return;
+        }
+
+        // now safe to convert
+        let src_min: Vec2<usize> = src_min.as_();
+        let src_max: Vec2<usize> = src_max.as_();
+
+        // iterate vertically
+        for y in src_min.y..src_max.y
+        {
+            // get the source image's row 
+            let src_buf = src.buf.row(y, src.width());
+            // take only the columns we care about
+            let src_buf = &src_buf[src_min.x..src_max.x];
+
+            // get the destination image's row
+            let dst_buf = self.buf.row_mut(y, self.width());
+            // take only the columns we care about
+            let dst_buf = &mut dst_buf[dst_min_x..dst_max_x];
+
+            // copy entire row at once
+            dst_buf.copy_from_slice(src_buf);
+        }
+    }
 }
 
 // // incrementally fill a slice `buf` with `ele`
