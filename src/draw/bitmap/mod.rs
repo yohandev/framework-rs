@@ -1,9 +1,9 @@
-mod chunk;
 mod draw;
 mod iter;
 mod buf;
 
 pub use self::buf::{ PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
+pub use self::iter::Chunk;
 
 use crate::math::{ Vec2, Rgba, Extent2 };
 

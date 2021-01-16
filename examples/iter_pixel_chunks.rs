@@ -28,26 +28,18 @@ impl Sketch for Foo
             c.background(c!("dodgerblue"));
         }
 
-        // // go through each chunk
-        // for (i, chunk) in self.0
-        //     .iter_pixel_chunks(v![40, 40])
-        //     .enumerate()
-        // {
-        //     // only draw the current chunk
-        //     if self.1 == i
-        //     {
-        //         // `Chunk` isn't `Bitmap` compatible yet...
-        //         for x in 0..40
-        //         {
-        //             for y in 0..40
-        //             {
-        //                 // do this the old fashion way... pixel by pixel
-        //                 c[chunk.pos() + v![x, y]] = chunk[v![x, y]];
-        //             }
-        //         }
-        //         break;
-        //     }   
-        // }
+        // go through each chunk
+        for (i, chunk) in self.0
+            .iter_pixel_chunks(v![40, 40].into())
+            .enumerate()
+        {
+            // only draw the current chunk
+            if self.1 == i
+            {
+                c.image(&chunk, *chunk.id());
+                break;
+            }   
+        }
         self.1 += 1;
     }
 }
