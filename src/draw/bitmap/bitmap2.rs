@@ -349,6 +349,79 @@ impl<I, B: PixelBufMut> Bitmap<I, B>
         self.line(b, c);
         self.line(c, a);
     }
+
+    /// draws a rectangle with top-left corner at `pos` and of
+    /// (width, height) `siz`. clips any pixels out of bounds.
+    pub fn rect(&mut self, pos: Vec2<i32>, siz: Vec2<i32>)
+    {
+        // size of this bitmap
+        let bounds: Vec2<i32> = self.size.as_().into();
+
+        // crop with top left corner(0, 0)
+        let siz = siz.map2(pos, |s, p| if p < 0 { s + p } else { s });
+        let pos = pos.map(|n| n.max(0));
+        // crop with bottom right corner(width - 1, height - 1)
+        let siz = siz.map3(pos, bounds, |siz, pos, bound|
+        {
+            let d = bound - (pos + siz);
+            if d < 0 { siz + d } else { siz }
+        });
+        
+        // empty rectangle
+        if siz.x <= 0 || siz.y <= 0
+        {
+            return;
+        }
+
+        // fill
+        if let Some(fill) = self.fill
+        {
+            // conversions are now safe
+            let pos: Vec2<usize> = pos.as_();
+            let siz: Vec2<usize> = siz.as_();
+
+            // get the first row
+            let row0 = 
+            {
+                // SAFETY: borrow checker isn't smart enough to know
+                // we're only borrowing the first row once
+                let this = &*self as *const Self as *mut Self;
+
+                unsafe { &mut *this }.buf.row_mut(pos.y, self.width())
+            };
+            // get only the columns we care about in the first row
+            let row0 = &mut row0[pos.x..pos.x + siz.x];
+
+            // fill the first row
+            super::incremental_fill(row0, fill);
+
+            // fill every other row
+            for y in pos.y + 1..pos.y + siz.y
+            {
+                // get the row
+                let row = self.buf.row_mut(y, self.width());
+
+                // get only the columns we care about
+                let row = &mut row[pos.x..pos.x + siz.x];
+
+                // copy the first row into this one
+                row.copy_from_slice(row0);
+            }
+        }
+        // stroke
+        if self.stroke.is_some()
+        {
+            let top_l = pos;
+            let btm_l = pos + Vec2::new(0, siz.y);
+            let top_r = pos + Vec2::new(siz.x, 0);
+            let btm_r = pos + siz;
+
+            self.line(top_l, top_r);
+            self.line(btm_l, btm_r);
+            self.line(top_l, btm_l);
+            self.line(top_r, btm_r);
+        }
+    }
 }
 
 // // incrementally fill a slice `buf` with `ele`
