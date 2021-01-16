@@ -173,3 +173,27 @@ impl<I, B: PixelBuf> Bitmap<I, B>
 /// in non-contiguous memory
 /// ```
 pub struct Chunk<'a>(Box<[&'a [Rgba<u8>]]>);
+
+unsafe impl<'a> PixelBuf for Chunk<'a>
+{
+    fn raw_row<'b>(&'b self, col: usize, width: usize) -> &'b [u8]
+    {
+        use std::slice::from_raw_parts as slice;
+        unsafe
+        {
+            slice(self.0[col].as_ptr() as *const u8, width * 4)
+        }
+    }
+
+    fn try_raw_pixels<'b>(&'b self) -> Option<&'b [u8]>
+    {
+        None
+    }
+
+    fn row<'b>(&'b self, col: usize, _: usize) -> &'b [Rgba<u8>]
+    {
+        // override default implementation to avoid double
+        // transmutes
+        self.0[col]   
+    }
+}
