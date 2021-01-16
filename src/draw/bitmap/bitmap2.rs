@@ -1,3 +1,5 @@
+use std::ops::{ Index, IndexMut };
+
 use rayon::prelude::*;
 
 use crate::draw::{ PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
@@ -244,6 +246,30 @@ impl<I, B: FlatPixelBufMut> Bitmap<I, B>
             .par_iter_mut()
             .enumerate()
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
+    }
+}
+
+impl<I, B: PixelBuf> Index<Vec2<i32>> for Bitmap<I, B>
+{
+    type Output = Rgba<u8>;
+
+    /// get the pixel color at the given position in pixels. panics if
+    /// out of bound
+    #[inline]
+    fn index(&self, pos: Vec2<i32>) -> &Self::Output
+    {
+        &self.buf.row(pos.y as usize, self.width())[pos.x as usize]
+    }
+}
+
+impl<I, B: PixelBufMut> IndexMut<Vec2<i32>> for Bitmap<I,B>
+{
+    /// get the pixel color at the given position in pixels. panics if
+    /// out of bound
+    #[inline]
+    fn index_mut(&mut self, pos: Vec2<i32>) -> &mut Self::Output
+    {
+        &mut self.buf.row_mut(pos.y as usize, self.width())[pos.x as usize]
     }
 }
 
