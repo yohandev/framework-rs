@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use crate::draw::{ PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
 use crate::math::{ Vec2, Rgba, Extent2 };
 
@@ -70,6 +72,38 @@ impl<I, B> Bitmap<I, B>
     pub fn area(&self) -> usize
     {
         self.width() * self.height()
+    }
+
+    /// set the fill colour to be used for any future drawing calls.
+    /// this is a shorthand for `canvas.fill = Some(col)`
+    #[inline]
+    pub fn fill(&mut self, col: Rgba<u8>)
+    {
+        self.fill = Some(col);
+    }
+
+    /// set the stroke colour to be used for any future drawing calls
+    /// this is a shorthand for `canvas.stroke = Some(col)`
+    #[inline]
+    pub fn stroke(&mut self, col: Rgba<u8>)
+    {
+        self.stroke = Some(col);
+    }
+
+    /// any future drawing calls will have no fill colour.
+    /// this is a shorthand for `canvas.fill = None`
+    #[inline]
+    pub fn no_fill(&mut self)
+    {
+        self.fill = None;
+    }
+
+    /// any future drawing calls will have no stroke colour.
+    /// this is a shorthand for `canvas.stroke = None`
+    #[inline]
+    pub fn no_stroke(&mut self)
+    {
+        self.stroke = None;
     }
 }
 
@@ -155,3 +189,59 @@ impl<I, B: PixelBufMut> Bitmap<I, B>
             .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
     }
 }
+
+impl<I, B: FlatPixelBuf> Bitmap<I, B>
+{
+    /// returns an parallel iterator over the pixels in this bitmap
+    ///
+    /// ```
+    /// frame.par_iter_pixels().for_each(|(pos, pixel)|
+    /// {
+    ///     if (*pixel[0] > 0)
+    ///     {
+    ///         println!("round some red!");
+    ///     }
+    /// });
+    ///```
+    pub fn par_iter_pixels(&self) -> impl ParallelIterator<Item = (Vec2<i32>, &Rgba<u8>)> + '_
+    {
+        let w = self.width();
+        let h = self.height();
+
+        self.pixels()
+            .par_iter()
+            .enumerate()
+            .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
+    }
+}
+
+impl<I, B: FlatPixelBufMut> Bitmap<I, B>
+{
+    /// returns a parallel, mutable iterator over the pixels in this bitmap
+    ///
+    /// ```
+    /// frame.par_iter_pixels_mut().for_each(|(pos, pixel)|
+    /// {
+    ///     // creates a black and white stripe pattern
+    ///     if pos.x % 2 == 0
+    ///     {
+    ///         pixel.copy_from_slice(&[0xff, 0xff, 0xff, 0xff]);
+    ///     }
+    ///     else
+    ///     {
+    ///         pixel.copy_from_slice(&[0x00, 0x00, 0x00, 0xff]);
+    ///     }
+    /// });
+    ///```
+    pub fn par_iter_pixels_mut(&mut self) -> impl ParallelIterator<Item = (Vec2<i32>, &mut Rgba<u8>)> + '_
+    {
+        let w = self.width();
+        let h = self.height();
+
+        self.pixels_mut()
+            .par_iter_mut()
+            .enumerate()
+            .map(move |(i, px)| (Vec2::new((i % w) as i32, (i / h) as i32), px))
+    }
+}
+
