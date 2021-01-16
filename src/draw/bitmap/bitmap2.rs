@@ -3,6 +3,8 @@ use rayon::prelude::*;
 use crate::draw::{ PixelBuf, PixelBufMut, FlatPixelBuf, FlatPixelBufMut };
 use crate::math::{ Vec2, Rgba, Extent2 };
 
+use super::incremental_fill;
+
 /// represents a bitmap, which can be iterated and
 /// drawn to
 ///
@@ -245,3 +247,76 @@ impl<I, B: FlatPixelBufMut> Bitmap<I, B>
     }
 }
 
+impl<I, B: PixelBufMut> Bitmap<I, B>
+{
+    /// fills this entire bitmap with a color. this is much more efficient
+    /// than iterating through the pixels and individually setting their
+    /// colors.
+    pub fn background(&mut self, col: Rgba<u8>)
+    {
+        // most optimized, incremental fill method:
+        if let Some(buf) = self.buf.try_pixels_mut()
+        {
+            super::incremental_fill(buf, col);
+        }
+        // less optimized, row-by-row fill method:
+        else
+        {
+            // get the first row
+            let row0 = 
+            {
+                // SAFETY: borrow checker isn't smart enough to know
+                // we're only borrowing the first row once
+                let this = &*self as *const Self as *mut Self;
+
+                unsafe { &mut *this }.buf.row_mut(0, self.width())
+            };
+
+            // fill the first row
+            super::incremental_fill(row0, col);
+
+            // fill every other row
+            for y in 1..self.height()
+            {
+                // get the row
+                let row = self.buf.row_mut(y, self.width());
+
+                // copy the first row into this one
+                row.copy_from_slice(row0);
+            }
+        }
+    }
+}
+
+// // incrementally fill a slice `buf` with `ele`
+// /// using a progressively larger memcpy...
+// /// 
+// /// works setting buf[0], then copying that to
+// /// buf[0..2], then copying buf[0..2] to buf[2..4],
+// /// then buf[0..4] to buf[4..8], etc.
+// fn incremental_fill<T: Copy>(buf: &mut [T], ele: T)
+// {
+//     // set the first element
+//     buf[0] = ele;
+
+//     // size is how much has been done so far(also the cursor)
+//     // rem is how much to be populated and may go below zero
+//     let mut siz = 1;
+//     let mut rem = buf.len() as isize;
+
+//     while rem > 0
+//     {
+//         // split what's already been cleared and what's remaining
+//         let (src, dst) = buf.split_at_mut(siz);
+
+//         // upper-bound index to copy
+//         let cpy = dst.len().min(siz);
+
+//         // copy over to clear some more
+//         dst[0..cpy].copy_from_slice(&src[0..cpy]);
+
+//         // grow by a factor of 2
+//         rem -= siz as isize;
+//         siz *= 2;
+//     }
+// }
