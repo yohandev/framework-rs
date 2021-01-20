@@ -156,9 +156,34 @@ impl<I, B: PixelBuf> Bitmap<I, B>
             Bitmap::new(pos, Chunk(buf), size)
         })
     }
+
+    pub fn iter_pixel_windows(&self, size: Extent2<usize>) -> impl Iterator<Item = Bitmap<Vec2<i32>, Chunk<'_>>>
+    {
+        // iterate in row-by-row zig-zag pattern
+        (0..self.height() - size.h - 1)
+        // do the cartesian product
+        .flat_map(move |y| (0..self.width() - size.w - 1).map(move |x| (x, y)))
+        // once we have zig-zag indices, begin dividing chunks:
+        .map(move |(x, y)|
+        {
+            // create sparse 2D buffer(see `Chunks::buf` doc)
+            let buf = (y..y + size.h)
+                // go through each row in chunk
+                .map(|y| &self.buf.row(y, self.width())[x..x + size.w])
+                // collect to box(no other choice, chunk isn't contiguous)
+                .collect::<Box<_>>();
+            
+            // convert pos
+            let pos = Vec2::new(x as i32, y as i32);
+            
+            // return chunks
+            Bitmap::new(pos, Chunk(buf), size)
+        })
+    }
 }
 
-/// a single chunk in [Bitmap::iter_pixel_chunks]
+/// a single chunk in [Bitmap::iter_pixel_chunks] and
+/// [Bitmap::iter_pixel_windows]
 ///
 /// `self.0`:
 /// outer-most array is columns, where
@@ -172,6 +197,9 @@ impl<I, B: PixelBuf> Bitmap<I, B>
 /// where &A, &B, and &C are assumed to be
 /// in non-contiguous memory
 /// ```
+///
+/// [Bitmap::iter_pixel_chunks]: super::Bitmap::iter_pixel_chunks
+/// [Bitmap::iter_pixel_windows]: super::Bitmap::iter_pixel_windows
 pub struct Chunk<'a>(Box<[&'a [Rgba<u8>]]>);
 
 unsafe impl<'a> PixelBuf for Chunk<'a>

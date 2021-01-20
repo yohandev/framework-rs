@@ -30,7 +30,7 @@ impl Window
         let logical_size = LogicalSize::new(size.w as f64, size.h as f64);
 
         let winit = WindowBuilder::new()
-            .with_min_inner_size(logical_size)
+            //.with_min_inner_size(logical_size)
             .with_inner_size(logical_size)
             .with_title(title)
             .build(target)
