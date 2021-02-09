@@ -180,6 +180,34 @@ impl<I, B: PixelBuf> Bitmap<I, B>
             Bitmap::new(pos, Chunk(buf), size)
         })
     }
+
+    pub fn iter_pixel_overlapping_chunks(&self, size: Extent2<usize>, inc: Vec2<usize>) -> impl Iterator<Item = Bitmap<Vec2<i32>, Chunk<'_>>>
+    {
+        // iterate in row-by-row zig-zag pattern
+        (0..(self.height() - size.h) / inc.y + 1)
+        // do the cartesian product
+        .flat_map(move |y| (0..(self.width() - size.w) / inc.x + 1).map(move |x| (x, y)))
+        // once we have zig-zag indices, begin dividing chunks:
+        .map(move |(x, y)|
+        {
+            // (x, y) is chunk index; remap to top-left corner in pixel
+            // space
+            let pos = Vec2::new(x * inc.x, y * inc.y);
+
+            // create sparse 2D buffer(see `Chunks::buf` doc)
+            let buf = (pos.y..pos.y + size.h)
+                // go through each row in chunk
+                .map(|y| &self.buf.row(y, self.width())[pos.x..pos.x + size.w])
+                // collect to box(no other choice, chunk isn't contiguous)
+                .collect::<Box<_>>();
+            
+            // convert pos
+            let pos = pos.as_();
+            
+            // return chunks
+            Bitmap::new(pos, Chunk(buf), size)
+        })
+    }
 }
 
 /// a single chunk in [Bitmap::iter_pixel_chunks] and

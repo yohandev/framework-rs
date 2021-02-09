@@ -38,7 +38,7 @@ impl Sketch for Foo
 
         // go through each chunk
         for (i, chunk) in self.0
-            .iter_pixel_chunks(v![40, 40].into())
+            .iter_pixel_overlapping_chunks(v![40, 40].into(), v![7, 7])
             .enumerate()
         {
             // only draw the current chunk
