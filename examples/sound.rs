@@ -1,12 +1,22 @@
+#[cfg(feature = "audio")]
 use framework::prelude::*;
 
+#[cfg(feature = "audio")]
 fn main()
 {
     framework::run::<Foo>();
 }
 
+#[cfg(not(feature = "audio"))]
+fn main()
+{
+    panic!("audio feature must be enabled!");
+}
+
+#[cfg(feature = "audio")]
 struct Foo(Track<f32>);
 
+#[cfg(feature = "audio")]
 impl Sketch for Foo
 {
     fn setup(app: &mut App) -> Self

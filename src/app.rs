@@ -9,6 +9,7 @@ use rand::prelude::ThreadRng;
 
 use crate::input::{ Input, Mouse, Keys, Time, ProcessedEvent };
 use crate::draw::{ CanvasId, Window, Image };
+#[cfg(feature = "audio")]
 use crate::sound::{ Audio, Track, Sample };
 use crate::math::Extent2;
 use crate::Sketch;
@@ -32,6 +33,7 @@ pub struct App
     next: CanvasId,
 
     /// audio context
+    #[cfg(feature = "audio")]
     audio: Audio,
 
     /// extra utility: random
@@ -61,6 +63,7 @@ impl App
             windows: Windows::default(),
             requests: Vec::new(),
             next: CanvasId::zero(),
+            #[cfg(feature = "audio")]
             audio: Audio::new(),
             rand: ThreadRng::default(),
         }
@@ -228,6 +231,7 @@ impl App
     /// - alac(".caf")
     ///
     /// [Track]: crate::audio::Track
+    #[cfg(feature = "audio")]
     pub fn load_sound<S: Sample>(&self, path: impl AsRef<Path>) -> Option<Track<S>>
     {
         Track::open(path, &self.audio).ok()

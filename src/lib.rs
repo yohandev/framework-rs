@@ -1,5 +1,6 @@
-pub mod input;
+#[cfg(feature = "audio")]
 pub mod sound;
+pub mod input;
 pub mod draw;
 pub mod util;
 pub mod math;
@@ -20,6 +21,7 @@ pub mod prelude
         Rgba,
         Extent2,
     };
+    #[cfg(feature = "audio")]
     pub use crate::sound::
     {
         Track,
