@@ -28,6 +28,7 @@ pub mod prelude
     };
     pub use crate::draw::
     {
+        IndexedParallelIterator,
         ParallelIterator,
         Image,
         Canvas,

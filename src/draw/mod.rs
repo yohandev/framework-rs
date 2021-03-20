@@ -11,4 +11,4 @@ pub use self::image::Image;
 
 pub(crate) use self::window::Window;
 
-pub use rayon::prelude::ParallelIterator;
+pub use rayon::prelude::{ ParallelIterator, IndexedParallelIterator };
