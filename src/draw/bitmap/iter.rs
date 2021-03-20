@@ -75,7 +75,7 @@ impl<I, B: FlatPixelBuf> Bitmap<I, B>
     ///     }
     /// });
     ///```
-    pub fn par_iter_pixels(&self) -> impl ParallelIterator<Item = (Vec2<i32>, &Rgba<u8>)> + '_
+    pub fn par_iter_pixels(&self) -> impl ParallelIterator<Item = (Vec2<i32>, &Rgba<u8>)> + IndexedParallelIterator + '_
     {
         let w = self.width();
         let h = self.height();
@@ -105,7 +105,7 @@ impl<I, B: FlatPixelBufMut> Bitmap<I, B>
     ///     }
     /// });
     ///```
-    pub fn par_iter_pixels_mut(&mut self) -> impl ParallelIterator<Item = (Vec2<i32>, &mut Rgba<u8>)> + '_
+    pub fn par_iter_pixels_mut(&mut self) -> impl ParallelIterator<Item = (Vec2<i32>, &mut Rgba<u8>)> + IndexedParallelIterator + '_
     {
         let w = self.width();
         let h = self.height();
