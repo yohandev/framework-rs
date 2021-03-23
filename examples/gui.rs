@@ -16,9 +16,9 @@ impl Sketch for MyGuiSketch
         MyGuiSketch(0.0)
     }
 
-    fn gui(&mut self, g: &mut Gui)
+    fn gui(&mut self, gui: &mut Gui)
     {
-        g
+        gui
             .window("Welcome to eGUI!")
             .resizable(true)
             .build(|ui|
@@ -28,7 +28,11 @@ impl Sketch for MyGuiSketch
                 {
                     ui.label("why did you click me... ;_;");
                 }
-                ui.slider(&mut self.0, -100.0..=100.0).build();
+                ui
+                    .slider(&mut self.0, -100.0..=100.0)
+                    .text("distance")
+                    .suffix("m")
+                    .build();
             });
     }
 }
