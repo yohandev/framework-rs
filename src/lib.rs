@@ -4,6 +4,8 @@ pub mod input;
 pub mod draw;
 pub mod util;
 pub mod math;
+//#[cfg(feature = "gui")]
+pub mod gui;
 
 mod sketch;
 mod app;
@@ -33,6 +35,11 @@ pub mod prelude
         Image,
         Canvas,
         CanvasId,
+    };
+    pub use crate::gui::
+    {
+        Gui,
+        UiExt,
     };
     pub use crate::input::
     {

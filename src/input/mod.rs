@@ -76,7 +76,7 @@ impl Input
     }
 
     /// process a raw incoming winit event
-    pub(crate) fn process(&mut self, event: Event<()>, windows: &Windows) -> ProcessedEvent
+    pub(crate) fn process(&mut self, event: &Event<()>, windows: &mut Windows) -> ProcessedEvent
     {
         use winit::event::WindowEvent;
 
@@ -95,29 +95,32 @@ impl Input
 
                 ProcessedEvent::None
             }
-            Event::WindowEvent { window_id, event } =>
+            Event::WindowEvent { window_id, event: evt } =>
             {
                 // fetch window this event refers to
                 //
                 // if window doesn't exist, we don't care do update
                 // its mouse/keyboard state
-                if let Some(window) = windows.get(&window_id)
+                if let Some(window) = windows.get_mut(&window_id)
                 {
                     // process mouse and keyboard
-                    self.mouse.process(&event, window);
-                    self.keys.process(&event);
+                    self.mouse.process(&evt, window);
+                    self.keys.process(&evt);
+
+                    // let egui process raw event
+                    window.gui.process(&event)
                 }
                 
                 // process additional
-                match event
+                match evt
                 {
                     WindowEvent::Resized(siz) =>
                     {
-                        ProcessedEvent::WindowResized(window_id, (siz.width, siz.height))
+                        ProcessedEvent::WindowResized(*window_id, (siz.width, siz.height))
                     }
                     WindowEvent::CloseRequested =>
                     {
-                        ProcessedEvent::WindowClose(window_id)
+                        ProcessedEvent::WindowClose(*window_id)
                     }
                     WindowEvent::DroppedFile(_) =>
                     {
@@ -135,7 +138,7 @@ impl Input
                 }
             }
             Event::MainEventsCleared => ProcessedEvent::ShouldUpdate,
-            Event::RedrawRequested(window_id) => ProcessedEvent::ShouldRender(window_id),
+            Event::RedrawRequested(window_id) => ProcessedEvent::ShouldRender(*window_id),
             _ => ProcessedEvent::None
         }
     }

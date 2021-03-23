@@ -13,7 +13,7 @@ use crate::math::{ Vec2, Rgba, Extent2 };
 /// the second generic argument `B` is the inner storage
 /// for pixels(raw [u8]) and `I` is this bitmap's ID, if
 /// any. that ID should be `Copy` to access it later
-#[derive(Debug, Default, Clone)]
+#[derive(Default, Clone)]
 pub struct Bitmap<I, B>
 {
     /// this bitmap's ID
@@ -38,7 +38,7 @@ impl<I, B> Bitmap<I, B>
         // pen
         let stroke = Some(Rgba::white());
         let fill = Some(Rgba::grey(0x80));
-
+        
         Self { id, buf, size, stroke, fill }
     }
 

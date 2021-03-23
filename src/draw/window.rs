@@ -5,19 +5,21 @@ use winit::event_loop::EventLoopWindowTarget;
 use pixels::{ Pixels, SurfaceTexture };
 
 use crate::draw::{ Canvas, CanvasId, Bitmap };
+use crate::gui::{ GuiCtx, Gui };
 use crate::math::Extent2;
 
 /// represents a window and a pixel buffer
-/// attatched to its swapchain
-#[derive(Debug)]
+/// attached to its swapchain
 pub(crate) struct Window
 {
     /// pixels buffer
-    pub pixels: Pixels<WinitWindow>,
+    pub pixels: Pixels,
     /// winit window
     pub winit: WinitWindow,
     /// pixel buffer size, in pixels
     pub size: Extent2<usize>,
+    /// this window's egui context
+    pub gui: GuiCtx,
     /// identifier passes to canvases
     pub id: CanvasId,
 }
@@ -44,10 +46,11 @@ impl Window
             
             Pixels::new(size.w as u32, size.h as u32, surf_tex).unwrap()
         };
+        let gui = GuiCtx::new(&winit, &pixels);
 
         Self
         {
-            pixels, winit, size, id
+            pixels, winit, size, gui, id
         }
     }
 
@@ -55,5 +58,18 @@ impl Window
     pub(crate) fn get_frame(&mut self) -> Canvas
     {
         Bitmap::new(self.id, self.pixels.get_frame(), self.size)
+    }
+
+    /// get the canvas to draw gui to
+    pub(crate) fn get_gui(&mut self) -> Gui
+    {
+        Gui::new(self.id, &self.gui.context())
+    }
+
+    /// resize the inner pixel and GUI framebuffer
+    pub(crate) fn resize(&mut self, w: u32, h: u32)
+    {
+        self.pixels.resize(w, h);
+        self.gui.resize(w, h);
     }
 }

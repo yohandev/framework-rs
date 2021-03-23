@@ -8,13 +8,17 @@ edition = "2018"
 audrey = { version = "0.3.0", optional = true }
 image = "0.23.12"
 num-traits = "0.2.14"
-pixels = "0.2.0"
+pixels = { git = "https://github.com/parasyte/pixels.git", rev = "f2d4a4f08491a307c1594d923b2e999cc7655b1d" }
 rand = "0.8.1"
 rayon = "1.5.0"
 rodio = { version = "0.13.0", default-features = false, optional = true }
 vek = "0.13.0"
 winit = "0.24.0"
+egui = { version = "0.10.0" }#, optional = true }
+egui_wgpu_backend = { git = "https://github.com/hasenbanck/egui_wgpu_backend.git", rev = "9d03ad345d15d1e44165849b242d3562fdf3e859" }#, optional = true }
+egui_winit_platform = { git = "https://github.com/hasenbanck/egui_winit_platform.git", rev = "17298250e9721e8bf2c1d4a17b3e22777f8cb2e8" }#, optional = true }
 
 [features]
 default = ["sound"]
 sound = ["audrey", "rodio"]
+#gui = ["egui", "egui_wgpu_backend", "egui_winit_platform"]

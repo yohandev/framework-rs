@@ -42,7 +42,7 @@ pub struct App
 
 /// double-key'd hashmap of `CanvasId` and `WindowId`s
 /// pointing to existing and open `Window`s
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub(crate) struct Windows
 {
     /// maps canvas id to window id
@@ -79,14 +79,14 @@ impl App
         control_flow: &mut ControlFlow
     )
     {
-        match self.input.process(event, &self.windows)
+        match self.input.process(&event, &mut self.windows)
         {
             // notify `Pixels` of the window resize
             ProcessedEvent::WindowResized(id, (w, h)) =>
             {
                 if let Some(window) = self.windows.get_mut(&id)
                 {
-                    window.pixels.resize(w, h);
+                    window.resize(w, h);
                 }
             }
             // close window and quit if needed
@@ -107,11 +107,27 @@ impl App
                 // get the frame
                 if let Some(window) = self.windows.get_mut(&id)
                 {
+                    // prepare GUI frame
+                    window.gui.prepare(&self.time);
+
                     // update buffer
                     sketch.draw(&mut window.get_frame());
+                    // draw gui
+                    sketch.gui(&mut window.get_gui());
+
+                    let (pixels, gui) = (&mut window.pixels, &mut window.gui);
 
                     // render
-                    if window.pixels.render().is_err()
+                    if pixels.render_with(|encoder, target, context|
+                    {
+                        // render pixels
+                        context.scaling_renderer.render(encoder, target);
+
+                        // render GUI
+                        gui.render(encoder, target, context);
+                    })
+                    .map_err(|e| eprintln!("pixels.render() failed: {}", e))
+                    .is_err()
                     {
                         return *control_flow = ControlFlow::Exit;
                     }
